@@ -1,5 +1,6 @@
 import { ValidationError } from "express-validator";
-
+import { DB } from "./Db";
+import { Request } from "express";
 export interface DataResponse {
     msg: string;
     data: any;
@@ -10,4 +11,8 @@ export interface ErrorResponse {
 export interface ErrorValidationResponse {
     msg: string;
     errors: ValidationError[];
+}
+
+export interface RequestUser extends Request {
+    user: DB.User;
 }
