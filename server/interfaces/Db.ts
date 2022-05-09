@@ -14,4 +14,11 @@ export namespace DB {
         phoneNumber?: string;
         country?: string;
     }
+
+    export interface Store {
+        storeId?: number;
+        userId: number;
+        name: string;
+        date_created?: string;
+    }
 }
