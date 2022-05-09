@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha -r ts-node/register tests/*.spec.ts --exit",
     "start": "ts-node ./index.ts",
-    "dev": "nodemon ./index.ts"
+    "dev": "nodemon ./index.ts",
+    "migratedb": "knex migrate:latest"
   },
   "keywords": [],
   "author": "",
