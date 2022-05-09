@@ -5,6 +5,7 @@ import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { hashPassword, verifyPassword } from '../helpers/password';
 import { signUser } from '../helpers/jwt';
+import { RequestUser } from '../interfaces';
 
 // Controller for registering user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -113,11 +114,24 @@ export const updateUserDetails = async (req: Request, res: Response, next: NextF
             return responseErrorValidation(res, 400, errors.array());
         }
 
-        const email: string = req.body.email;
-        const pass: string = req.body.password;
-        const publicKey: string = req.body.publicKey;
+        const reqUser = req as RequestUser;
 
+        const firstName: string = req.body.firstName;
+        const lastName: string = req.body.lastName;
+        const phoneNumber: string = req.body.phoneNumber;
+        const country: string = req.body.country;
 
+        const users: DB.UserDetails[] = await knex<DB.UserDetails>('UserDetails').where({ userId: reqUser.user.userId });
+
+        if (users.length === 0) {
+            await knex<DB.UserDetails>('UserDetails').insert({ userId: reqUser.user.userId, firstName, lastName, phoneNumber, country }).where({ userId: reqUser.user.userId });
+
+            return responseSuccess(res, 201, 'Successfully updated user details', {});
+        }
+
+        await knex<DB.UserDetails>('UserDetails').update({ firstName, lastName, phoneNumber, country }).where({ userId: reqUser.user.userId });
+
+        return responseSuccess(res, 201, 'Successfully updated user details', {});
     } catch (err) {
         next(err);
     }
