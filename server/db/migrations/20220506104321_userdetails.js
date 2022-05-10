@@ -7,7 +7,7 @@ exports.up = function (knex) {
     t.integer('userId').notNullable().references('userId').inTable('Users');
     t.string('firstName');
     t.string('lastName');
-    t.string('phoneNumber');
+    t.string('phoneNumber').unique();
     t.string('country');
   });
 };
