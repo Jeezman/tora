@@ -21,4 +21,15 @@ export namespace DB {
         name: string;
         date_created?: string;
     }
+
+    export interface Product {
+        productId?: number;
+        storeId: number;
+        name: string;
+        amount: number;
+        description: string;
+        dTimeline: number;
+        count: number;
+        date_created?: string;
+    }
 }
