@@ -4,7 +4,9 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import routes from './routes';
 import { responseError } from './helpers';
-
+import passport from 'passport';
+import session from 'express-session';
+import initializePassport from './helpers/passport';
 dotenv.config();
 
 const app: Application = express();
@@ -13,6 +15,19 @@ const app: Application = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(session({
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: true,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+initializePassport();
+app.use(passport.authenticate('lnurl-auth'));
+
 app.use('/', routes);
 
 // Error handler
