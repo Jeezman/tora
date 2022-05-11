@@ -1,0 +1,10 @@
+ .container {
+     border: 6px solid rgb(118, 182, 243);
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     height: 100vh;
+     color: #555;
+     background-color: aliceblue;
+     background-color: gold;
+ }
