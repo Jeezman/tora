@@ -40,4 +40,13 @@ export namespace DB {
         date_created?: string;
         products?: Product[];
     }
+
+    export interface Cart {
+        productId: number;
+        buyerPubKey?: string;
+        buyerUsername?: string;
+        amount: number;
+        itemCount: number;
+        total: number;
+    }
 }

@@ -5,7 +5,6 @@ import path from 'path';
 import { authUser } from '../../helpers/auth';
 const router = Router();
 
-
 router.post('/register', registerUser);
 
 router.post('/login', loginUser);
