@@ -1,26 +1,23 @@
 import axios, { AxiosError } from 'axios';
-// import { BASE_URL } from '../constants';
+import { ConsolidatedLoginDetail, ConsolidatedRegisterDetail, LoginRequestModel, RegisterRequestModel } from '../pages/models/auth.model';
 
 export const BASE_URL = 'http://localhost:5002/api/';
-
 
 axios.defaults.baseURL = BASE_URL;
 
 type ServerError = {
   error: string;
+  msg: string;
+  data: any;
 };
-type Data = {
-  data: string;
-};
 
 
-
-export const login = async (data): Promise<any> => {
-    console.log(data)
+export const login = async (params: LoginRequestModel): Promise<ConsolidatedLoginDetail> => {
+    console.log(params)
   try {
-      const res = await axios.post<Data>('user/login', {
-          email: data.email,
-          password: data.password
+      const res:ConsolidatedLoginDetail = await axios.post('user/login', {
+          email: params.email,
+          password: params.password
       });
     return res;
   } catch (error: any) {
@@ -32,20 +29,20 @@ export const login = async (data): Promise<any> => {
       }
     }
     console.log('calling error ', error);
-    return { error };
+    return  error.response.data;
   }
 };
 
-export const register = async (data): Promise<any> => {
-    console.log(data)
+export const register = async (params:RegisterRequestModel): Promise<ConsolidatedRegisterDetail> => {
+    console.log(params)
   try {
-      const res = await axios.post<Data>('user/register', {
-          email: data.email,
-          password: data.password,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phoneNumber: data.phoneNumber,
-          country: data.country,
+      const res:ConsolidatedRegisterDetail = await axios.post('user/register', {
+          email: params.email,
+          password: params.password,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          phoneNumber: params.phoneNumber,
+          country: params.country,
       });
     return res;
   } catch (error: any) {
@@ -56,6 +53,6 @@ export const register = async (data): Promise<any> => {
       }
     }
     console.log('calling error ', error);
-    return { error };
+    return error.response.data;
   }
 };

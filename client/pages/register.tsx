@@ -1,20 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { LightningIcon } from '../assets/icons';
 import styles from '../styles/Register.module.css';
 import { AuthContext } from './context/AuthContext';
 
 export default function Register() {
-  const { isLoggedIn, isLoading, handleRegister } = useContext(AuthContext);
+  const {isLoading, handleRegister } = useContext(AuthContext);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [country, setCountry] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleRegister({ email, password, firstName, lastName, phone, country });
+    handleRegister({ email, password, firstName, lastName, phoneNumber, country });
     console.log('submitting');
   };
 
@@ -75,7 +74,7 @@ export default function Register() {
           </label>
           <input
             id="phoneNumber"
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhoneNumber(e.target.value)}
             aria-label="text"
             className={styles.input}
             type="text"
