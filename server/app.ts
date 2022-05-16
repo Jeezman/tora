@@ -1,6 +1,7 @@
 import express, { Application, Response, Request, NextFunction } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import http from 'http';
 import dotenv from 'dotenv';
 import routes from './routes';
 import { responseError } from './helpers';
@@ -10,6 +11,7 @@ import initializePassport from './helpers/passport';
 dotenv.config();
 
 const app: Application = express();
+const server = http.createServer(app);
 
 // App middlewares
 app.use(cors());
@@ -40,4 +42,4 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     }
 });
 
-export default app;
+export default server;

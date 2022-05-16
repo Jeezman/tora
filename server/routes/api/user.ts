@@ -3,7 +3,11 @@ import { registerUser, loginUser, updateUserDetails } from '../../controllers/us
 import LnurlAuth from 'passport-lnurl-auth';
 import path from 'path';
 import { authUser } from '../../helpers/auth';
+import { DB } from '../../interfaces/Db';
+import 'dotenv/config';
+
 const router = Router();
+const frontendLogin  = process.env.FRONTEND_LOGIN_URL;
 
 router.post('/register', registerUser);
 
@@ -11,14 +15,14 @@ router.post('/login', loginUser);
 
 router.get('/login', (req, res, next) => {
     if (req.user) {
-        // console.log('user found', req.user);
-        return res.redirect('/');
+        const reqUser = req.user as DB.User;
+        return res.redirect(`${frontendLogin}?pubkey=${reqUser.publicKey}`);
     }
     next();
 },
     new LnurlAuth.Middleware({
-        callbackUrl: 'https://9d0a-102-89-40-5.eu.ngrok.io/api/user/login',
-        cancelUrl: 'https://9d0a-102-89-40-5.eu.ngrok.io',
+        callbackUrl: 'https://51ff-102-89-34-251.eu.ngrok.io/api/user/login',
+        cancelUrl: 'https://51ff-102-89-34-251.eu.ngrok.io',
         instruction: 'Scan the QR code to login',
         title: 'Login using lnurl-auth',
         loginTemplateFilePath: path.join(__dirname, '..', '..', 'public', 'login.html'),
