@@ -1,0 +1,16 @@
+.container {
+    display: grid;
+    border: 3px solid green;
+    grid-template-columns: auto auto;
+    height: 100vh;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    border: 4px solid red;
+}
+
+.content {
+    border: 4px solid purple;
+}
