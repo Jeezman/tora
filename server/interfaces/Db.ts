@@ -43,10 +43,20 @@ export namespace DB {
 
     export interface Cart {
         productId: number;
+        cartId: string;
         buyerPubKey?: string;
         buyerUsername?: string;
         amount: number;
         itemCount: number;
         total: number;
+        storeId?: number;
+    }
+
+    export interface CartId {
+        id?: number;
+        cartId: string;
+        buyerUsername: string;
+        status: string;
+        date_created?: string;
     }
 }

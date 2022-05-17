@@ -6,6 +6,7 @@ import { DB } from '../interfaces/Db';
 const initializePassport = () => {
 
     passport.serializeUser((user: DB.User, done) => {
+        // console.log('User from Serialize ==', user);
         done(null, user.publicKey);
     });
 
@@ -15,16 +16,15 @@ const initializePassport = () => {
 
     passport.use(new LnurlAuth.Strategy(async (linkingPublicKey: string, done: (d: any, u: DB.User) => void) => {
         let user: DB.User;
+        console.log('USER KEY ===', linkingPublicKey)
         let users: DB.User[] = await knex<DB.User>('Users').where({ publicKey: linkingPublicKey });
-
-        // console.log('Users ====', users);
 
         if (users.length === 0) {
             await knex<DB.User>('Users').insert({ publicKey: linkingPublicKey });
         }
 
         user = users[0];
-        done(null, user);
+        return done(null, user);
     }));
 };
 

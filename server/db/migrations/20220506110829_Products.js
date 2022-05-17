@@ -11,6 +11,7 @@ exports.up = function (knex) {
     t.text('description').notNullable();
     t.integer('dTimeline').notNullable();
     t.integer('count').notNullable();
+    t.text('image');
     t.dateTime('date_created').notNullable().defaultTo(knex.fn.now());
   });
 };

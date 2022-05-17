@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { deleteFromCart, addToCart, updateCart } from '../../controllers/cart';
-import { authUser } from '../../helpers/auth';
+import { deleteFromCart, addToCart, updateCart, listCart } from '../../controllers/cart';
 const router = Router();
 
 router.post('/add', addToCart);
 
+router.get('/list', listCart);
+
 router.put('/update', updateCart);
 
-router.post('/delete', deleteFromCart);
+router.delete('/delete', deleteFromCart);
 
 export default router;
