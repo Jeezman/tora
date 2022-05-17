@@ -25,6 +25,7 @@ export namespace DB {
         count: number;
         date_created?: string;
         perPage?: number;
+        image?: string;
         currentPage?: number;
         pagination?: {
             perPage: number,
