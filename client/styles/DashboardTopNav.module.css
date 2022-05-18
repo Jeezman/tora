@@ -5,9 +5,7 @@
     margin-right: 144px;
     justify-content: space-between;
     align-items: center;
-    border-color: rgba(237,241,245,1);
-    border-bottom-width: 1;
-    border-bottom-style: solid;
+    border-bottom: 1px solid rgba(237,241,245,1);
     padding: 2rem;
 }
 
