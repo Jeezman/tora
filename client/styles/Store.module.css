@@ -1,0 +1,11 @@
+.container {
+    background-color: aliceblue;
+    border: 6px solid rgb(118, 182, 243);
+    height: 100vh;
+    padding: 5rem 10rem;
+    overflow: scroll;
+}
+
+.products {
+    display: grid;
+}

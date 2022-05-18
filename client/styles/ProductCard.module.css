@@ -1,0 +1,28 @@
+.container {
+  border-radius: 6px;
+  height: 300px;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  /* width: 40%; */
+  overflow: hidden;
+}
+
+.image_wrap {
+  background: rgb(61, 125, 184);
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details {
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 30px;
+  flex-grow: 1;
+}
