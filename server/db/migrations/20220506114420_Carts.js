@@ -4,6 +4,7 @@
  */
 exports.up = function (knex) {
   return knex.schema.createTable('Carts', (t) => {
+    t.string('cartId').notNullable();
     t.integer('productId')
       .notNullable()
       .references('productId')
