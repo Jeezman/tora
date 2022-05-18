@@ -4,6 +4,8 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { RequestUser } from '../interfaces';
+import { attachPaginate } from 'knex-paginate';
+attachPaginate();
 
 // Controller for registering user
 export const createStore = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -25,10 +27,107 @@ export const createStore = async (req: Request, res: Response, next: NextFunctio
             return responseError(res, 404, 'Store name already exists');
         }
 
-        await knex<DB.Store>('Stores').insert({ userId, name });
+        await knex<DB.Store>('Stores').insert({ userId, name: name.toLowerCase() });
 
-        responseSuccess(res, 200, 'Successfully created store', {});
+        return responseSuccess(res, 200, 'Successfully created store', {});
 
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const addProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const storeId: number = req.body.storeId;
+
+        // Check if the store belongs to the user
+        const reqUser = req as RequestUser;
+        const store: DB.Store[] = await knex<DB.Store>('Stores').where({ storeId });
+
+        if (store.length > 0 && store[0].userId === reqUser.user.userId) {
+
+            const name: string = req.body.name;
+            const amount: number = req.body.amount;
+            const description: string = req.body.description;
+            const dTimeline: number = req.body.dTimeline;
+            const count: number = req.body.count;
+
+            await knex<DB.Product>('Products').insert({ storeId, name, amount, description, dTimeline, count });
+
+            return responseSuccess(res, 200, 'Successfully created product', {});
+        }
+
+        return responseError(res, 404, 'You don\'t have access to this store');
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const updateProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const storeId: number = req.body.storeId;
+        const productId: number = req.body.productId;
+
+        // Check if product belongs to the store
+        const reqUser = req as RequestUser;
+
+        const store: DB.Store[] = await knex<DB.Store>('Stores').where({ storeId });
+        const product: DB.Product[] = await knex<DB.Product>('Products').where({ storeId, productId });
+
+        if (product.length > 0 && store[0].userId === reqUser.user.userId) {
+
+            const name: string = req.body.name;
+            const amount: number = req.body.amount;
+            const description: string = req.body.description;
+            const dTimeline: number = req.body.dTimeline;
+            const count: number = req.body.count;
+
+            await knex<DB.Product>('Products').update({ storeId, name, amount, description, dTimeline, count }).where({ productId });
+
+            return responseSuccess(res, 200, 'Successfully updated product', {});
+        }
+
+        return responseError(res, 404, 'You don\'t have access to this product');
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const storeProducts = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const name: string = req.params.storeName;
+
+        // Check if the store exists
+        const stores: DB.Store[] = await knex<DB.Store>('Stores').where({ name });
+
+        if (stores.length) {
+            const store = stores[0];
+
+            // @ts-ignore
+            const products: DB.Product[] = await knex<DB.Product>('Products').where({ storeId: store.storeId }).paginate({ perPage: 1, currentPage: 0 });
+            if (store) {
+                store.products = products;
+            }
+
+            return responseSuccess(res, 200, 'Successfully created product', store);
+        }
+
+        return responseError(res, 404, 'Store does not exists');
     } catch (err) {
         next(err);
     }
