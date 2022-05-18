@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import knex from '../db/knex';
 import { validationResult } from 'express-validator';
+import { Formidable } from 'formidable';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { RequestUser } from '../interfaces';
 import { attachPaginate } from 'knex-paginate';
+import { uploadFile } from '../config/cloudinary';
+
 attachPaginate();
 
 // Controller for registering user
@@ -75,11 +78,12 @@ export const addProduct = async (req: Request, res: Response, next: NextFunction
 
             const name: string = req.body.name;
             const amount: number = req.body.amount;
+            const image: string = req.body.image;
             const description: string = req.body.description;
             const dTimeline: number = req.body.dTimeline;
             const count: number = req.body.count;
 
-            await knex<DB.Product>('Products').insert({ storeId, name, amount, description, dTimeline, count });
+            await knex<DB.Product>('Products').insert({ storeId, name, amount, description, dTimeline, count, image });
 
             return responseSuccess(res, 200, 'Successfully created product', {});
         }
@@ -110,11 +114,12 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
             const name: string = req.body.name;
             const amount: number = req.body.amount;
+            const image: string = req.body.image;
             const description: string = req.body.description;
             const dTimeline: number = req.body.dTimeline;
             const count: number = req.body.count;
 
-            await knex<DB.Product>('Products').update({ storeId, name, amount, description, dTimeline, count }).where({ productId });
+            await knex<DB.Product>('Products').update({ storeId, name, amount, description, dTimeline, count, image }).where({ productId });
 
             return responseSuccess(res, 200, 'Successfully updated product', {});
         }
@@ -152,6 +157,32 @@ export const storeProducts = async (req: Request, res: Response, next: NextFunct
         }
 
         return responseError(res, 404, 'Store does not exists');
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const productImage = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const form = new Formidable();
+
+        form.parse(req, (err, fields, files) => {
+             
+            // @ts-ignore
+            uploadFile(files.upload.filepath, (err, url) => {
+                if(err) {
+                    return responseError(res, 403, err);
+                } else {
+                    return responseSuccess(res, 201, 'Successfully updated product image', url);
+                }
+            });
+        });
     } catch (err) {
         next(err);
     }
