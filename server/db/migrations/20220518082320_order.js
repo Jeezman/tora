@@ -6,7 +6,7 @@ exports.up = function (knex) {
   return knex.schema.createTable('Order', (t) => {
     t.increments('id').primary().notNullable();
     t.string('orderId').notNullable();
-    t.string('buyerUsername').notNullable();
+    t.integer('userId').notNullable();
     t.enum('status', ['active', 'closed']).notNullable().defaultTo('active');
     t.dateTime('date_created').notNullable().defaultTo(knex.fn.now());
   });

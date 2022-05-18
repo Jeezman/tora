@@ -11,6 +11,6 @@ router.put('/update', updateCart);
 
 router.delete('/delete', deleteFromCart);
 
-router.delete('/checkout', authUser, cartCheckout);
+router.post('/checkout', authUser, cartCheckout);
 
 export default router;

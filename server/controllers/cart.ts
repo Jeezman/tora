@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import knex from '../db/knex';
 import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
-import { responseSuccess, responseErrorValidation } from '../helpers';
+import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
 import { RequestUser } from '../interfaces';
 
@@ -27,7 +27,7 @@ export const addToCart = async (req: Request, res: Response, next: NextFunction)
         const cartExist = await knex<DB.Cart>('Carts').where({ buyerUsername, productId }).orWhere({ buyerPubKey, productId });
 
         if (cartExist.length > 0) {
-            await knex<DB.Cart>('Carts').update({ total: knex.raw(`total +  ${itemCount * amount}`), itemCount: cartExist[0].itemCount +  itemCount }).where({ buyerUsername, productId }).orWhere({ buyerPubKey, productId });
+            await knex<DB.Cart>('Carts').update({ total: knex.raw(`total +  ${itemCount * amount}`), itemCount: cartExist[0].itemCount + itemCount }).where({ buyerUsername, productId }).orWhere({ buyerPubKey, productId });
 
             return responseSuccess(res, 200, 'Updated to cart successfully', {});
         } else {
@@ -103,7 +103,7 @@ export const listCart = async (req: Request, res: Response, next: NextFunction):
         }
 
         let carts: DB.Cart[]
-        const buyerPubKey: string  = String(req.query.buyerPubKey);
+        const buyerPubKey: string = String(req.query.buyerPubKey);
         const buyerUsername: string = String(req.query.buyerUsername);
 
         if (buyerPubKey !== 'undefined') {
@@ -158,8 +158,50 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
         const reqUser = req as RequestUser;
         const cartId: string = req.body.cartId;
 
-        return responseSuccess(res, 200, 'Deleted from cart successfully', {});
+        const orderId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
+        // Insert orderId in the database
+        await knex<DB.Order>('Order').insert({ orderId, userId: reqUser.user.userId })
+            .returning('orderId')
+            .then(async () => {
+                // Get all items with cartId
+                const cartItems: DB.Cart[] = await knex<DB.Cart>('Carts').where({ cartId });
+
+                // Map cart data to order
+                const orderItems = cartItems.map(item => {
+                    return {
+                        userId: reqUser.user.userId,
+                        orderId,
+                        productId: item.productId,
+                        itemAmount: item.amount,
+                        itemCount: item.itemCount,
+                        itemTotal: item.total,
+                        storeId: item.storeId,
+                    }
+                });
+
+                // Insert in order
+                await knex<DB.OrderItems>('OrderItems').insert(orderItems);
+
+                // update cartId to closed
+                await knex<DB.CartId>('CartId').update({ status: 'closed' }).where({ cartId });
+
+                // delete all from cart
+                await knex<DB.Cart>('Carts').where({ cartId }).delete();
+
+                // Get the order total
+                const orderTotal = orderItems.reduce((partial, item) =>  partial + item.itemTotal, 0);
+
+                const data = {
+                    orderTotal,
+                    orderItems
+                }
+
+                return responseSuccess(res, 200, 'Placed order successfully', data);
+            })
+            .catch(e => {
+                return responseError(res, 403, 'Error occured while creating order');
+            })
     } catch (err) {
         next(err);
     }

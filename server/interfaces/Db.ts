@@ -61,18 +61,18 @@ export namespace DB {
         date_created?: string;
     }
 
-    export interface orderBy {
+    export interface Order {
         id?: number;
         orderId: string;
-        buyerUsername: string;
+        userId: number;
         status: string;
         date_created?: string;
     }
 
     export interface OrderItems {
         productId: number;
-        cartId: string;
-        buyerUsername?: string;
+        orderId: string;
+        userId: number;
         itemAmount: number;
         itemCount: number;
         itemTotal: number;
