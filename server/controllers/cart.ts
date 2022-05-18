@@ -146,6 +146,35 @@ export const deleteFromCart = async (req: Request, res: Response, next: NextFunc
     }
 };
 
+// Controller for deleting  all items from cart
+export const deleteAllFromCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const buyerPubKey: string = req.body.buyerPubKey;
+        const buyerUsername: string = req.body.buyerUsername;
+        const cartId: string = req.body.cartId;
+
+        if (buyerPubKey) {
+            await knex<DB.Cart>('Carts').delete().where({ buyerPubKey, cartId });
+        } else {
+            await knex<DB.Cart>('Carts').delete().where({ buyerUsername, cartId })
+        }
+
+        // update cartId to closed
+        await knex<DB.CartId>('CartId').update({ status: 'closed' }).where({ cartId });
+
+        return responseSuccess(res, 200, 'Deleted all from cart successfully', {});
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 // Controller for checking out cart
 export const cartCheckout = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
