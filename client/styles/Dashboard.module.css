@@ -8,3 +8,11 @@
      background-color: aliceblue;
      background-color: gold;
  }
+
+ .top {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+ }
+
+ 

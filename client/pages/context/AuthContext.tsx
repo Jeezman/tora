@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { login, register } from '../../api';
-import { storeData } from '../../util/storage';
+import { getData, storeData } from '../../util/storage';
 import { LoginRequestModel, RegisterRequestModel } from '../models/auth.model';
 
 interface Props {
@@ -54,7 +54,18 @@ export const AuthContextProvider = ({ children }: Props) => {
     }
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const _getData = async () => {
+      let token = await getData('token')
+      console.log('token dey? ', token)
+      if (token) {
+        setIsLoggedIn(true)
+        // router.push('/dashboard')
+      }
+    }
+    // let token = getData('token');
+    _getData()
+  }, []);
 
   const contextValue = {
     isLoggedIn,
