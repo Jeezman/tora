@@ -133,6 +133,8 @@ export const storeProducts = async (req: Request, res: Response, next: NextFunct
         }
 
         const name: string = req.params.storeName;
+        const currentPage = Number(req.query.currentPage);
+        const perPage = Number(req.query.perPage);
 
         // Check if the store exists
         const stores: DB.Store[] = await knex<DB.Store>('Stores').where({ name });
@@ -141,7 +143,7 @@ export const storeProducts = async (req: Request, res: Response, next: NextFunct
             const store = stores[0];
 
             // @ts-ignore
-            const products: DB.Product[] = await knex<DB.Product>('Products').where({ storeId: store.storeId }).paginate({ perPage: 1, currentPage: 0 });
+            const products: DB.Product[] = await knex<DB.Product>('Products').where({ storeId: store.storeId }).paginate({ perPage: perPage, currentPage: currentPage});
             if (store) {
                 store.products = products;
             }
