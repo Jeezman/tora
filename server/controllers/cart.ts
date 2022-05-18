@@ -4,6 +4,7 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation } from '../helpers';
 import { v4 } from 'uuid';
+import { RequestUser } from '../interfaces';
 
 // Controller for adding to cart
 export const addToCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -137,6 +138,25 @@ export const deleteFromCart = async (req: Request, res: Response, next: NextFunc
         } else {
             await knex<DB.Cart>('Carts').delete().where({ buyerUsername, productId, cartId })
         }
+
+        return responseSuccess(res, 200, 'Deleted from cart successfully', {});
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Controller for checking out cart
+export const cartCheckout = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const reqUser = req as RequestUser;
+        const cartId: string = req.body.cartId;
 
         return responseSuccess(res, 200, 'Deleted from cart successfully', {});
 
