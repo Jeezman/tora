@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import styles from './DashboardLayout.module.css';
 import Head from 'next/head';
 import Link from 'next/link';
+import { DashboardTopNav } from './DashboardNav';
 
 const name = 'Taro';
 export const siteTitle = 'Bitcoin/Lightning store front';
@@ -28,17 +29,23 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       </Head>
       <section className={styles.container}>
         <aside className={styles.sidebar}>
-          <Link href="/dashboard/overview/">
-            <a>Overview</a>
-          </Link>
-          <Link href="/dashboard/products">
-            <a>Products</a>
-          </Link>
-          <Link href="/dashboard/orders">
-            <a>Orders</a>
-          </Link>
+          <div className={styles.sidebar_menu}>
+            <Link href="/dashboard/overview/">
+              <a className={styles.sidebar_menu_item}>Overview</a>
+            </Link>
+            <Link href="/dashboard/products">
+              <a className={styles.sidebar_menu_item}>Products</a>
+            </Link>
+            <Link href="/dashboard/orders">
+              <a className={styles.sidebar_menu_item}>Orders</a>
+            </Link>
+          </div>
         </aside>
-        <aside className={styles.content}>{children}</aside>
+
+        <aside className={styles.dashboard}>
+          <DashboardTopNav />
+          <div className={styles.content}>{children}</div>
+        </aside>
       </section>
     </main>
   );
