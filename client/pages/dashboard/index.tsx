@@ -10,7 +10,20 @@ function Dashboard() {
 
   return (
       <section>
-        <h1>Dashboard Page</h1>
+      <h1>Dashboard</h1>
+      <div>
+        <h1>Wallets</h1>
+        <p>Total balance $0.00 USD</p>
+      </div>
+      <div>
+        <div>
+          <p>0 BTC</p>
+          <p>$0.00 USD</p>
+        </div>
+      </div>
+      <aside>
+        <h2>Recent Transactions</h2>
+      </aside>
       </section>
 
   );
