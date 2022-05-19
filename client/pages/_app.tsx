@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { AuthContextProvider } from './context/AuthContext';
 import { DashboardContextProvider } from './context/DashboardContext';
+import { StoreContextProvider } from './context/StoreContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
   // @ts-ignore
@@ -9,9 +10,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthContextProvider>
       <DashboardContextProvider>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <StoreContextProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </StoreContextProvider>
       </DashboardContextProvider>
     </AuthContextProvider>
   );

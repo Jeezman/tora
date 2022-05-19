@@ -30,6 +30,9 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
       <section className={styles.container}>
         <aside className={styles.sidebar}>
           <div className={styles.sidebar_menu}>
+            <Link href="/dashboard/">
+              <a className={styles.sidebar_menu_item}>Dashboard</a>
+            </Link>
             <Link href="/dashboard/overview/">
               <a className={styles.sidebar_menu_item}>Overview</a>
             </Link>

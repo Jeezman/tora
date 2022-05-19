@@ -29,3 +29,25 @@ export interface ConsolidatedRegisterDetail {
 
 export interface RegisterDetail {
 }
+
+export interface ProductRequestModel{
+    storeId?: number;
+    productId?: number;
+    name: string;
+    amount: number;
+    description: string;
+    dTimeline: number;
+    count: number,
+    image: string | null
+}
+
+export interface ConsolidatedProductDetail {
+    msg:  string;
+    data: ProductDetail;
+}
+
+export interface ProductDetail {
+    data: {}
+}
+
+
