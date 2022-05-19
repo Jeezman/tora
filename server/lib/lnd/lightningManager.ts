@@ -1,4 +1,3 @@
-// @ts-nocheck
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
 const fs = require('fs');
@@ -9,12 +8,26 @@ const LightningError = Object.freeze({
   UNCATEGORIZED: 'UNCATEGORIZED',
 });
 
+interface Credential {
+  macaroonPath: string | undefined
+}
+
+interface LNRPC {
+  Lightning: any
+}
+
 
 /**
  * Defines a wrapper around the Lightning gRPC API, with error support, retry, and async API.
  * Every call towards `Lightning` should be handled through the `Call` API.
  */
 class LightningManager {
+  lndHost: string | undefined;
+  lndCert: string;
+  lnrpc: LNRPC;
+  macaroonPath: string | undefined;
+  activeClient: object | string | null;
+  credentials?: object;
   /**
    * @constructor
    * @param {string} protoPath - the path to the `rpc.proto` file that defined the `Lightning` RPC
@@ -24,7 +37,8 @@ class LightningManager {
    * @param {?string} macaroonPath - the path to the macarron file to use. Can be `null` if no
    *                                 macaroon should be used.
    */
-   constructor(protoPath, lndHost, lndCertPath, macaroonPath) {
+   constructor(protoPath: string, lndHost: string | undefined, lndCertPath: string | undefined, macaroonPath: string | undefined) {
+     
     process.env.GRPC_SSL_CIPHER_SUITES = 'HIGH+ECDSA';
 
     if (!fs.existsSync(lndCertPath)) {
@@ -63,13 +77,13 @@ class LightningManager {
     return this.activeClient;
   }
 
-  static generateCredentials(lndCert, options) {
+  static generateCredentials(lndCert: string, options: Credential) {
     let credentials = grpc.credentials.createSsl(lndCert);
 
     // If macaroon path was specified load credentials using macaroon metadata.
     if (options.macaroonPath) {
       if (fs.existsSync(options.macaroonPath)) {
-        const macaroonCreds = grpc.credentials.createFromMetadataGenerator((args, callback) => {
+        const macaroonCreds = grpc.credentials.createFromMetadataGenerator((args:object, callback: any) => {
           const adminMacaroon = fs.readFileSync(options.macaroonPath);
           const metadata = new grpc.Metadata();
           metadata.add('macaroon', adminMacaroon.toString('hex'));
@@ -94,11 +108,11 @@ class LightningManager {
    *                      otherwise it will fail
    * with a LightningError.
    */
-  async call(method, parameters) {
+  async call(method: string, parameters: any) {
     return new Promise((resolve, reject) => {
-      const activeClient = this.getActiveClient();
+      const activeClient:any = this.getActiveClient();
       
-      activeClient[method](parameters, (err, response) => {
+      activeClient[method](parameters, (err:any, response:any) => {
         if (err) {
           // drop active client, so that it can be recreated
           this.activeClient = null;
@@ -126,7 +140,7 @@ class LightningManager {
     });
   }
 
-  async verifyMessage(data) {
+  async verifyMessage(data: string) {
     return this.call('verifyMessage', data);
   }
 }
