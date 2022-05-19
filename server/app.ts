@@ -27,7 +27,22 @@ app.use(session({
 }));
 
 // test route
-app.get('/lightning', lightningRPCAdapter("getNetworkInfo"))
+app.get('/lightning', lightningRPCAdapter("getNetworkInfo"));
+
+app.get('/invoice', lightningRPCAdapter('addInvoice', {
+    isLimitedToAuthorizedUser: true,
+    preHook: () => {
+        var invoiceRequest = { memo: "Test invoice", value: 0, expiry: 0 };
+        if (true) {
+            invoiceRequest.value = 100;
+        }
+        if (true) { 
+            invoiceRequest.expiry = 3600;
+        }
+        return invoiceRequest;
+      }
+    },
+  ));
 
 app.use(passport.initialize());
 app.use(passport.session());
