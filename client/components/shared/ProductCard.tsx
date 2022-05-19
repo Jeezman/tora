@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { CartIcon } from '../../assets/icons';
 import Image from 'next/image';
 import styles from '../../styles/ProductCard.module.css';
+import { ProductRequestModel } from '../../pages/models/store.model';
 
-interface Props {
-  onClick: () => void;
+interface Props extends ProductRequestModel {
+  onClick?: () => void;
 }
 
-export const ProductCard = ({ onClick }: Props) => {
+export const ProductCard = ({ onClick, name, amount }: Props) => {
   const [img, setImg] = useState('');
   return (
-    <div className={styles.container}>
+    <div onClick={onClick} className={styles.container}>
       <div className={styles.image_wrap}>
         {!!img ? (
           <Image
@@ -25,8 +26,8 @@ export const ProductCard = ({ onClick }: Props) => {
         )}
       </div>
       <div className={styles.details}>
-        <p className="name">Lagoon</p>
-        <p className="price">500</p>
+        <p className="name">{name}</p>
+        <p className="price">${amount}</p>
       </div>
     </div>
   );
