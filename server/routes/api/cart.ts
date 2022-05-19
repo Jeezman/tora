@@ -13,6 +13,6 @@ router.delete('/delete', deleteFromCart);
 
 router.delete('/deleteall', deleteAllFromCart);
 
-router.post('/checkout', authUser, cartCheckout);
+router.post('/checkout', cartCheckout);
 
 export default router;
