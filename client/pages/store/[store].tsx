@@ -11,9 +11,9 @@ function Store() {
     // console.log('product cliecked')
   };
 
-  useEffect(() => {
-    handleGetAllProducts();
-  }, []);
+ useEffect(() => {
+    if(!!storeName) handleGetAllProducts();
+  }, [storeName]);
 
   return (
     <section className={styles.container}>

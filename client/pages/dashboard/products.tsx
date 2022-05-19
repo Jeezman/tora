@@ -9,15 +9,15 @@ import { ProductRequestModel } from '../models/store.model';
 
 function Products() {
   const [showProductForm, setShowProductForm] = useState(false);
-  const { handleAddProduct, handleGetAllProducts, products } =
+  const { handleAddProduct, handleGetAllProducts, products, storeName } =
     useContext(StoreContext);
   const closeProductForm = () => {
     setShowProductForm(false);
   };
 
   useEffect(() => {
-    handleGetAllProducts();
-  }, []);
+    if(!!storeName) handleGetAllProducts();
+  }, [storeName]);
 
   const onAddProduct = (data: ProductRequestModel) => {
     handleAddProduct(data);

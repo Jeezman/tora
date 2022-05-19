@@ -67,9 +67,27 @@ export const createProduct = async (
   }
 };
 
-export const fetchProducts = async () => {
+export const fetchProducts = async (storeName: string) => {
   try {
-    const res = await axios.get(`store/products/taro?currentPage=0&perPage=10`);
+    console.log('store nameeee is  ', storeName)
+    const res = await axios.get(`store/products/${storeName}?currentPage=0&perPage=10`);
+    return res.data;
+  } catch (error: any) {
+    console.log('error is  ', error);
+    if (axios.isAxiosError(error)) {
+      const serverError = error as AxiosError<ServerError>;
+      if (serverError && serverError.response) {
+        return serverError.response.data;
+      }
+    }
+    console.log('calling error ', error);
+    return error.response.data;
+  }
+}
+
+export const fetchStore = async () => {
+  try {
+    const res = await axios.get(`store/list`);
     return res.data;
   } catch (error: any) {
     console.log('error is  ', error);

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { createStore, createProduct, fetchProducts } from '../../api/store';
+import {
+  createStore,
+  createProduct,
+  fetchProducts,
+  fetchStore,
+} from '../../api/store';
 import { getData, storeData } from '../../util/storage';
 import { StoreRequestModel, ProductRequestModel } from '../models/store.model';
 
@@ -14,7 +19,7 @@ interface IStoreContext {
   handleCreateStore: (data: StoreRequestModel) => void;
   handleAddProduct: (data: ProductRequestModel) => void;
   handleGetAllProducts: () => void;
-  products: ProductRequestModel[]
+  products: ProductRequestModel[];
 }
 
 const defaultState = {
@@ -33,6 +38,15 @@ export const StoreContextProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
   const [products, setProducts] = useState(defaultState.products);
 
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      const res = await fetchStore();
+      setStoreName(res.data[0].name);
+    };
+
+    fetchStoreData();
+  }, []);
+
   const handleCreateStore = async (data: StoreRequestModel) => {
     setIsLoading(true);
     let response = await createStore(data);
@@ -50,20 +64,20 @@ export const StoreContextProvider = ({ children }: Props) => {
     console.log('handleAddProduct ', data);
     let response = await createProduct(data);
 
-      let isData = Object.keys(response.data);
-      if (isData.length > 0) {
-          handleGetAllProducts()
-      }
+    let isData = Object.keys(response.data);
+    if (isData.length > 0) {
+      handleGetAllProducts();
+    }
 
     console.log('handleAddProduct ', { res: response.data, isData });
   };
 
   const handleGetAllProducts = async () => {
-      let response = await fetchProducts();
-      
-    setProducts(response.data.products.data)
+    let response = await fetchProducts(storeName);
+
+    setProducts(response.data.products.data);
     setStoreName(response.data.name);
-      console.log('handleGetAllProducts ', response)
+    console.log('handleGetAllProducts ', response);
   };
 
   const contextValue = {
