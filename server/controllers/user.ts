@@ -6,6 +6,7 @@ import { responseSuccess, responseErrorValidation, responseError } from '../help
 import { hashPassword, verifyPassword } from '../helpers/password';
 import { signUser } from '../helpers/jwt';
 import { RequestUser } from '../interfaces';
+import ipToUser from '../helpers/ipToUser';
 
 // Controller for registering user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -59,12 +60,17 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const email: string = req.body.email;
         const pass: string = req.body.password;
         const publicKey: string = req.body.publicKey;
+        const ipAddress: string = req.body.ipAddress;
 
         if (publicKey) {
             const users: DB.User[] = await knex<DB.User>('Users').where({ publicKey });
 
             if (users.length > 0) {
                 let user = users[0];
+
+                // If user is login in to checkout cart update IP address to user public key
+                ipToUser(user.publicKey, ipAddress);
+
                 // Delete user password and pk
                 delete user.password;
                 delete user.publicKey;
@@ -79,11 +85,16 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         }
 
         const users: DB.User[] = await knex<DB.User>('Users').where({ email });
+
         if (users.length > 0) {
             let user = users[0];
+
             if (!verifyPassword(pass, user.password)) {
                 return responseError(res, 404, 'Error with login');
             }
+
+            // If user is login in to checkout cart update IP address to user email
+            ipToUser(user.email, ipAddress);
 
             // Delete user password and pk
             delete user.password;
@@ -98,7 +109,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         } else {
             return responseError(res, 404, 'Not a valid user');
         }
-
     } catch (err) {
         next(err);
     }
