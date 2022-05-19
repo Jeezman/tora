@@ -8,6 +8,8 @@ import { responseError } from './helpers';
 import passport from 'passport';
 import session from 'express-session';
 import initializePassport from './helpers/passport';
+import { lightningRPCAdapter } from './helpers/lightningRPCAdapter';
+
 dotenv.config();
 
 const app: Application = express();
@@ -23,6 +25,9 @@ app.use(session({
 	resave: false,
 	saveUninitialized: true,
 }));
+
+// test route
+app.get('/lightning', lightningRPCAdapter("getNetworkInfo"))
 
 app.use(passport.initialize());
 app.use(passport.session());

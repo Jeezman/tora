@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@grpc/proto-loader": "^0.6.12",
     "@radar/lnrpc": "^0.11.1-beta.1",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
@@ -24,6 +25,7 @@
     "express-session": "^1.17.2",
     "express-validator": "^6.14.0",
     "formidable": "^2.0.1",
+    "grpc": "^1.24.11",
     "jsonwebtoken": "^8.5.1",
     "knex": "^2.0.0",
     "knex-paginate": "^3.0.1",
