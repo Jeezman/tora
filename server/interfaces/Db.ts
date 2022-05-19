@@ -60,4 +60,22 @@ export namespace DB {
         status: string;
         date_created?: string;
     }
+
+    export interface Order {
+        id?: number;
+        orderId: string;
+        userId: number;
+        status: string;
+        date_created?: string;
+    }
+
+    export interface OrderItems {
+        productId: number;
+        orderId: string;
+        userId: number;
+        itemAmount: number;
+        itemCount: number;
+        itemTotal: number;
+        storeId?: number;
+    }
 }
