@@ -10,7 +10,7 @@ exports.up = function (knex) {
       .notNullable()
       .references('productId')
       .inTable('Products');
-    t.integer('userId').notNullable();
+    t.string('user').notNullable();
     t.float('itemAmount').notNullable();
     t.integer('itemCount').notNullable();
     t.float('itemTotal').notNullable();

@@ -184,13 +184,15 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
             return responseErrorValidation(res, 400, errors.array());
         }
 
-        const reqUser = req as RequestUser;
         const cartId: string = req.body.cartId;
+        const email: string = req.body.email;
+        const phoneNumber: string = req.body.phoneNumber;
+        const address: string = req.body.address;
 
         const orderId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
         // Insert orderId in the database
-        await knex<DB.Order>('Order').insert({ orderId, userId: reqUser.user.userId })
+        await knex<DB.Order>('Order').insert({ orderId, user: phoneNumber })
             .returning('orderId')
             .then(async () => {
                 // Get all items with cartId
@@ -199,7 +201,7 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
                 // Map cart data to order
                 const orderItems = cartItems.map(item => {
                     return {
-                        userId: reqUser.user.userId,
+                        user: phoneNumber,
                         orderId,
                         productId: item.productId,
                         itemAmount: item.amount,
@@ -209,8 +211,18 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
                     }
                 });
 
+                const orderDetails = {
+                    orderId,
+                    email,
+                    phoneNumber,
+                    address
+                };
+
                 // Insert in order
                 await knex<DB.OrderItems>('OrderItems').insert(orderItems);
+
+                // Inser order details 
+                await knex<DB.OrderDetails>('OrderDetails').insert(orderDetails);
 
                 // update cartId to closed
                 await knex<DB.CartId>('CartId').update({ status: 'closed' }).where({ cartId });
@@ -223,6 +235,7 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
 
                 const data = {
                     orderTotal,
+                    orderDetails,
                     orderItems
                 }
 

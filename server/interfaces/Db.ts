@@ -64,7 +64,7 @@ export namespace DB {
     export interface Order {
         id?: number;
         orderId: string;
-        userId: number;
+        user: string;
         status: string;
         date_created?: string;
     }
@@ -72,10 +72,17 @@ export namespace DB {
     export interface OrderItems {
         productId: number;
         orderId: string;
-        userId: number;
+        user: string;
         itemAmount: number;
         itemCount: number;
         itemTotal: number;
         storeId?: number;
+    }
+
+    export interface OrderDetails {
+        orderId: string;
+        address: string;
+        email: string;
+        phoneNumber: string;
     }
 }
