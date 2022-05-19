@@ -3,11 +3,13 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable('Order', (t) => {
+  return knex.schema.createTable('OrderPayments', (t) => {
     t.increments('id').primary().notNullable();
+    t.string('paymentId').notNullable();
     t.string('orderId').notNullable();
-    t.string('user').notNullable();
-    t.enum('status', ['active', 'closed']).notNullable().defaultTo('active');
+    t.float('totalAmount').notNullable();
+    t.text('invoice').notNullable();
+    t.text('address').notNullable();
     t.dateTime('date_created').notNullable().defaultTo(knex.fn.now());
   });
 };
@@ -17,5 +19,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTable('Order');
+  return knex.schema.dropTable('OrderPayments');
 };

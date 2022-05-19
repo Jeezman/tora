@@ -60,16 +60,12 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         const email: string = req.body.email;
         const pass: string = req.body.password;
         const publicKey: string = req.body.publicKey;
-        const ipAddress: string = req.body.ipAddress;
 
         if (publicKey) {
             const users: DB.User[] = await knex<DB.User>('Users').where({ publicKey });
 
             if (users.length > 0) {
                 let user = users[0];
-
-                // If user is login in to checkout cart update IP address to user public key
-                ipToUser(user.publicKey, ipAddress);
 
                 // Delete user password and pk
                 delete user.password;
@@ -92,9 +88,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             if (!verifyPassword(pass, user.password)) {
                 return responseError(res, 404, 'Error with login');
             }
-
-            // If user is login in to checkout cart update IP address to user email
-            ipToUser(user.email, ipAddress);
 
             // Delete user password and pk
             delete user.password;

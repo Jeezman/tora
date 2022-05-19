@@ -20,7 +20,7 @@ export const addToCart = async (req: Request, res: Response, next: NextFunction)
         const amount: number = req.body.amount;
         const total: number = req.body.total;
         const buyerPubKey: string = String(req.body.buyerPubKey);
-        const buyerUsername: string = String(req.body.buyerUsername);
+        const buyerUsername: string = String(req.socket.remoteAddress);
         const storeId: number = req.body.storeId;
 
         // If the product is already added update it and return
@@ -78,7 +78,7 @@ export const updateCart = async (req: Request, res: Response, next: NextFunction
         const amount: number = req.body.amount;
         const total: number = req.body.total;
         const buyerPubKey: string = req.body.buyerPubKey;
-        const buyerUsername: string = req.body.buyerUsername;
+        const buyerUsername: string = String(req.socket.remoteAddress);
 
         if (buyerPubKey) {
             await knex<DB.Cart>('Carts').update({ itemCount, amount, total }).where({ buyerPubKey, productId, cartId });
@@ -104,7 +104,7 @@ export const listCart = async (req: Request, res: Response, next: NextFunction):
 
         let carts: DB.Cart[]
         const buyerPubKey: string = String(req.query.buyerPubKey);
-        const buyerUsername: string = String(req.query.buyerUsername);
+        const buyerUsername: string = String(req.socket.remoteAddress);
 
         if (buyerPubKey !== 'undefined') {
             carts = await knex<DB.Cart>('Carts').where({ buyerPubKey });
@@ -130,7 +130,7 @@ export const deleteFromCart = async (req: Request, res: Response, next: NextFunc
 
         const productId: number = req.body.productId;
         const buyerPubKey: string = req.body.buyerPubKey;
-        const buyerUsername: string = req.body.buyerUsername;
+        const buyerUsername: string = String(req.socket.remoteAddress);
         const cartId: string = req.body.cartId;
 
         if (buyerPubKey) {
@@ -156,7 +156,7 @@ export const deleteAllFromCart = async (req: Request, res: Response, next: NextF
         }
 
         const buyerPubKey: string = req.body.buyerPubKey;
-        const buyerUsername: string = req.body.buyerUsername;
+        const buyerUsername: string = String(req.socket.remoteAddress);
         const cartId: string = req.body.cartId;
 
         if (buyerPubKey) {
@@ -184,13 +184,15 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
             return responseErrorValidation(res, 400, errors.array());
         }
 
-        const reqUser = req as RequestUser;
         const cartId: string = req.body.cartId;
+        const email: string = req.body.email;
+        const phoneNumber: string = req.body.phoneNumber;
+        const address: string = req.body.address;
 
         const orderId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
         // Insert orderId in the database
-        await knex<DB.Order>('Order').insert({ orderId, userId: reqUser.user.userId })
+        await knex<DB.Order>('Order').insert({ orderId, user: phoneNumber })
             .returning('orderId')
             .then(async () => {
                 // Get all items with cartId
@@ -199,7 +201,7 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
                 // Map cart data to order
                 const orderItems = cartItems.map(item => {
                     return {
-                        userId: reqUser.user.userId,
+                        user: phoneNumber,
                         orderId,
                         productId: item.productId,
                         itemAmount: item.amount,
@@ -209,8 +211,18 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
                     }
                 });
 
+                const orderDetails = {
+                    orderId,
+                    email,
+                    phoneNumber,
+                    address
+                };
+
                 // Insert in order
                 await knex<DB.OrderItems>('OrderItems').insert(orderItems);
+
+                // Inser order details 
+                await knex<DB.OrderDetails>('OrderDetails').insert(orderDetails);
 
                 // update cartId to closed
                 await knex<DB.CartId>('CartId').update({ status: 'closed' }).where({ cartId });
@@ -219,10 +231,11 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
                 await knex<DB.Cart>('Carts').where({ cartId }).delete();
 
                 // Get the order total
-                const orderTotal = orderItems.reduce((partial, item) =>  partial + item.itemTotal, 0);
+                const orderTotal = orderItems.reduce((partial, item) => partial + item.itemTotal, 0);
 
                 const data = {
                     orderTotal,
+                    orderDetails,
                     orderItems
                 }
 
