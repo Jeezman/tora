@@ -64,6 +64,7 @@ export namespace DB {
     export interface Order {
         id?: number;
         orderId: string;
+        storeId: number;
         user: string;
         status: string;
         date_created?: string;

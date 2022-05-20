@@ -4,7 +4,6 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
-import { RequestUser } from '../interfaces';
 
 // Controller for adding to cart
 export const addToCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -188,11 +187,20 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
         const email: string = req.body.email;
         const phoneNumber: string = req.body.phoneNumber;
         const address: string = req.body.address;
+        const storeName: string = req.body.storeName;
 
         const orderId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
+        // Get storeId
+        const stores: DB.Store[] = await knex<DB.Store>('Stores').where({name: storeName});
+
+        if(stores.length === 0) return responseError(res, 404, 'Store not found');
+
+        // Get storeId
+        const storeId = stores[0].storeId;
+
         // Insert orderId in the database
-        await knex<DB.Order>('Order').insert({ orderId, user: phoneNumber })
+        await knex<DB.Order>('Order').insert({ orderId, user: phoneNumber, storeId })
             .returning('orderId')
             .then(async () => {
                 // Get all items with cartId
