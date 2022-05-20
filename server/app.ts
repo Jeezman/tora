@@ -2,16 +2,19 @@ import express, { Application, Response, Request, NextFunction } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import http from 'http';
-import dotenv from 'dotenv';
 import routes from './routes';
 import { responseError } from './helpers';
 import passport from 'passport';
 import session from 'express-session';
 import initializePassport from './helpers/passport';
-dotenv.config();
+import { walletCheck } from './services/wallet';
+import 'dotenv/config';
 
 const app: Application = express();
 const server = http.createServer(app);
+
+// Create Tora wallet
+walletCheck();
 
 // App middlewares
 app.use(cors());

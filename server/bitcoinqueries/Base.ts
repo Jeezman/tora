@@ -10,20 +10,18 @@ import Wallet from './Wallet';
 export default class QueryBase extends Auth {
     addresses: Addresses;
     transactions: Transactions;
-    address: Addresses;
     wallet: Wallet;
 
     constructor(user: string | undefined, pass: string | undefined, rpcurl: string | undefined, port: number | undefined) {
         super(user, pass, rpcurl, port);
         this.addresses = new Addresses(this.user, this.pass, this.rpcurl, this.port);
         this.transactions = new Transactions(this.user, this.pass, this.rpcurl, this.port);
-        this.address = new Addresses(this.user, this.pass, this.rpcurl, this.port);
         this.wallet = new Wallet(this.user, this.pass, this.rpcurl, this.port);
     }
 
     /** Address Queries */
     getNewAddress(label: string, type: addressType, wallet: string): Promise<AxiosResponse> {
-        return this.address.getNewAddress(label, type, wallet);
+        return this.addresses.getNewAddress(label, type, wallet);
     }
     /** End Of Address Queries */
 
