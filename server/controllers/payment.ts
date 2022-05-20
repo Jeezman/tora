@@ -19,10 +19,10 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
         const orderId: string = req.params.orderId;
         const totalAmount: number = req.body.orderTotal;
 
-        // Generate Lightning Bitcoin address
+        // Generate Bitcoin address
         const bitcoinAddress = (await bitcoinq.addresses.getNewAddress('paymentaddress', addressType.bech32, 'torawallet')).data.result;
 
-        // Geenrate Lightning Invoice
+        // Generate Lightning Invoice
         const lnInvoice: string = '';
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
