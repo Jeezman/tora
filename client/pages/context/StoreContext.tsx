@@ -80,9 +80,11 @@ export const StoreContextProvider = ({ children }: Props) => {
   const handleGetAllProducts = async () => {
     let response = await fetchProducts(storeName);
 
-    setProducts(response.data.products.data);
-    setStoreName(response.data.name);
     console.log('handleGetAllProducts ', response);
+    if (response) {
+      setProducts(response.data.products.data);
+      setStoreName(response.data.name);
+    }
   };
 
   const contextValue = {
