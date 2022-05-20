@@ -1,7 +1,57 @@
-const Checkout = () => {
-    return <div>
-        <h1>Checkout</h1>
-    </div>
-}
+import { useState } from 'react';
+import { Button } from '../../../components/shared/Button';
+import styles from '../../../styles/Store.module.css';
 
-export default Checkout
+const Checkout = () => {
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+    const [addres, setAddress] = useState('');
+    
+    const handleCheckout = () => {}
+  return (
+    <section className={styles.container}>
+      <h1 className="text-6xl">Checkout</h1>
+      <div className='mb-2 w-2/5'>
+        <div className="mb-6 mt-10">
+          <label htmlFor="email" className="mb-[3px] block text-gray-600">
+            Email
+          </label>
+          <input
+            id="email"
+            placeholder="John@example.com"
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            className=" form-control block w-full  px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          />
+        </div>
+        <div className="mb-6">
+          <label htmlFor="phone" className="mb-[3px] block text-gray-600">
+            Phone Number
+          </label>
+          <input
+            id="phone"
+            placeholder="08082223322"
+            onChange={(e) => setPhone(e.target.value)}
+            type="tel"
+            className=" form-control block w-full  px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          />
+        </div>
+        <div className="mb-6">
+          <label htmlFor="address" className="mb-[3px] block text-gray-600">
+            Email
+          </label>
+          <input
+            id="address"
+            placeholder="4 Unamed road, Lagos"
+            onChange={(e) => setAddress(e.target.value)}
+            type="text"
+            className=" form-control block w-full  px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          />
+        </div>
+        <Button onClick={handleCheckout}>Pay</Button>
+      </div>
+    </section>
+  );
+};
+
+export default Checkout;
