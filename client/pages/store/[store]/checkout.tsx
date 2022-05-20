@@ -1,13 +1,44 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Button } from '../../../components/shared/Button';
 import styles from '../../../styles/Store.module.css';
+import { CartContext } from '../../context/CartContext';
+import { CheckoutRequestModel } from '../../models/cart.model';
+import { useRouter } from 'next/router';
+import { PaymentModal } from '../../../components/PaymentModal';
 
 const Checkout = () => {
+  const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment } =
+    useContext(CartContext);
+  
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-    const [addres, setAddress] = useState('');
+  const [address, setAddress] = useState('');
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+
+  const router = useRouter();
+  
+  console.log('router ', router);
     
-    const handleCheckout = () => {}
+  const handleCheckout = async () => {
+    let data = {
+      email,
+      phoneNumber: phone,
+      address,
+      cartId: cartItems[0].cartId,
+      storeName: router.query.store
+    }
+    showModal()
+    handleCartCheckout(data)
+  }
+
+  const closeModal = () => {
+    setShowPaymentModal(false)
+  }
+
+  const showModal = () => {
+    setShowPaymentModal(true)
+  }
+
   return (
     <section className={styles.container}>
       <h1 className="text-6xl">Checkout</h1>
@@ -50,6 +81,7 @@ const Checkout = () => {
         </div>
         <Button onClick={handleCheckout}>Pay</Button>
       </div>
+      <PaymentModal show={showPaymentModal} close={closeModal} />
     </section>
   );
 };

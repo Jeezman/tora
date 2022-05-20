@@ -1,7 +1,14 @@
 import React, { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
-function Modal({ title, show, closeModal, handleSubmit, children }: any) {
+function Modal({
+  title,
+  show,
+  closeModal,
+  handleSubmit,
+  children,
+  showFooter = true,
+}: any) {
   const [storeName, setStoreName] = useState('');
   return (
     <>
@@ -38,15 +45,17 @@ function Modal({ title, show, closeModal, handleSubmit, children }: any) {
                     <h1>{title}</h1>
                   </Dialog.Title>
                   {children}
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => handleSubmit(storeName)}
-                    >
-                      Submit
-                    </button>
-                  </div>
+                  {showFooter && (
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        onClick={() => handleSubmit(storeName)}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  )}
                 </Dialog.Panel>
               </Transition.Child>
             </div>

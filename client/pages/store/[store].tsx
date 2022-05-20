@@ -15,7 +15,7 @@ function Store() {
     storeName,
     setStoreName,
   } = useContext(StoreContext);
-  const { handleAddToCart, handleFetchCart, cartItems } =
+  const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout } =
     useContext(CartContext);
   const [sidebarActive, setSidebarActive] = useState(false);
 
@@ -43,7 +43,6 @@ function Store() {
       storeId: product.storeId,
     };
 
-    console.log('data is ', data);
     handleAddToCart(data);
   };
 
