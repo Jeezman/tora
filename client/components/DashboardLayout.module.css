@@ -1,0 +1,47 @@
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(251, 252, 253, 1);
+  border-color: rgba(237, 241, 245, 1);
+  border-right-width: 1px;
+  flex-shrink: 0;
+  height: 100%;
+  margin-top: 0;
+  padding-top: 1.25rem;
+  z-index: 20;
+  width: 20%;
+}
+
+.sidebar_menu {
+  padding-top: 5rem;
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar_menu_item {
+  display: block;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  color: rgb(16, 18, 20, 0.8);
+}
+.sidebar_menu_item:hover {
+  color: rgb(72, 150, 240, 1);
+}
+
+.dashboard {
+  width: 80%;
+}
+
+.content {
+  padding-top: 2rem;
+  padding-left: 5rem;
+  padding-right: 5rem;
+}
