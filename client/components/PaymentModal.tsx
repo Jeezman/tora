@@ -3,6 +3,7 @@ import { SpinnerIcon } from '../assets/icons';
 import Modal from './shared/Modal';
 import styles from '../styles/PaymentModal.module.css';
 import { CartContext } from '../pages/context/CartContext';
+import {QRCodeSVG} from "qrcode.react"
 
 type Props = {
   show?: boolean;
@@ -54,7 +55,8 @@ export const PaymentModal = ({ show, close }: Props) => {
               <div>
                 <h2 className='mb-2 mt-4 font-semibold'>Lightning Address</h2>
                 <span className={styles.address}>{addresses.lnInvoice}</span>
-              </div>
+                </div>
+                <QRCodeSVG value={addresses.lnInvoice} includeMargin size={256} />
             </aside>
           )}
         </section>
