@@ -19,6 +19,7 @@ interface IStoreContext {
   handleCreateStore: (data: StoreRequestModel) => void;
   handleAddProduct: (data: ProductRequestModel) => void;
   handleGetAllProducts: () => void;
+  setStoreName: (data: any) => void;
   products: ProductRequestModel[];
 }
 
@@ -29,6 +30,7 @@ const defaultState = {
   handleCreateStore: (data: StoreRequestModel) => {},
   handleAddProduct: (data: ProductRequestModel) => {},
   handleGetAllProducts: () => {},
+  setStoreName: () => {},
 };
 
 export const StoreContext = React.createContext<IStoreContext>(defaultState);
@@ -41,7 +43,10 @@ export const StoreContextProvider = ({ children }: Props) => {
   useEffect(() => {
     const fetchStoreData = async () => {
       const res = await fetchStore();
-      setStoreName(res.data[0].name);
+      let token = await getData('token');
+      if (token) {
+        setStoreName(res?.data[0]?.name);
+      }
     };
 
     fetchStoreData();
@@ -75,13 +80,16 @@ export const StoreContextProvider = ({ children }: Props) => {
   const handleGetAllProducts = async () => {
     let response = await fetchProducts(storeName);
 
-    setProducts(response.data.products.data);
-    setStoreName(response.data.name);
     console.log('handleGetAllProducts ', response);
+    if (response) {
+      setProducts(response.data.products.data);
+      setStoreName(response.data.name);
+    }
   };
 
   const contextValue = {
     storeName,
+    setStoreName,
     isLoading,
     products,
     handleCreateStore,
