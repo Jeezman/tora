@@ -15,7 +15,7 @@ export const createInvoice = async (amount: string, expiry: string): Promise<Add
 };
 
 export const createAddress = async (): Promise<string> => {
-    const { data }  = await bitcoin.address.getNewAddress('paymentaddress',  addressType.bech32, 'torawallet');
+    const { data }  = await bitcoin.addresses.getNewAddress('paymentaddress',  addressType.bech32, 'torawallet');
     const address = data.result;
     return address;
 }
