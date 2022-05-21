@@ -1,0 +1,71 @@
+.container {
+  background-color: aliceblue;
+  border: 6px solid rgb(118, 182, 243);
+  height: 100vh;
+  padding: 5rem 10rem;
+  overflow: scroll;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.products {
+  display: grid;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  align-self: flex-end;
+  cursor: pointer;
+}
+.icon:hover {
+  opacity: 0.75;
+}
+
+.icon_no {
+  color: #3d7db8;
+  font-weight: 500;
+  margin-left: 5px;
+}
+
+.main_sidebar {}
+
+.cart_sidebar {
+  position: absolute;
+  background-color: #fff;
+  right: 0;
+  min-width: 25rem;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  transform: translateX(100%);
+    transition: transform .25s, -webkit-transform .25s;
+        display: flex;
+            flex-direction: column;
+            padding: 5rem 2rem;
+}
+
+.active {
+ transform: translateX(0);
+}
+
+.cart_sidebar_overlay {
+    background: rgba(48, 55, 66, .5);
+        border-color: transparent;
+        border-radius: 0;
+        bottom: 0;
+        display: none;
+        height: 100%;
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 100%;
+}
+
+.cart_sidebar.active ~ .cart_sidebar_overlay {
+    display: block;
+    z-index: 100;
+}

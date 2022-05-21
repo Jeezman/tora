@@ -3,11 +3,11 @@ import lndClient from '../config/lnd';
 import bitcoin from '../bitcoinqueries';
 import { addressType } from '../interfaces/Address';
 
-export const createInvoice = async (amount: string, expiry: string): Promise<AddInvoiceResponse> => {
+export const createInvoice = async (amount: number = 0, expiry: string | undefined): Promise<AddInvoiceResponse> => {
     const rpc = await lndClient;
 
     const invoice = await rpc.addInvoice({
-        value: amount,
+        value: JSON.stringify(amount),
         expiry
     });
 

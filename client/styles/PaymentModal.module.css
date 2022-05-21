@@ -1,0 +1,37 @@
+.container {
+    position: relative;
+}
+
+.content {
+    min-height: 100px;
+}
+
+.loading_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(224, 217, 217, 0.859);
+}
+
+.loading_container svg {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.address {
+    word-break: break-all;
+}

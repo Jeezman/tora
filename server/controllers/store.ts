@@ -39,6 +39,28 @@ export const createStore = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
+// Controller for registering user
+export const listStores = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const reqUser = req as RequestUser;
+
+        const userId: number = Number(reqUser.user.userId);
+
+        let stores: DB.Store[] = await knex<DB.Store>('Stores').where({ userId });
+
+        return responseSuccess(res, 200, 'Successfully listed stores', stores);
+
+    } catch (err) {
+        next(err);
+    }
+};
+
 export const addProduct = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const errors = validationResult(req);
@@ -116,6 +138,8 @@ export const storeProducts = async (req: Request, res: Response, next: NextFunct
         }
 
         const name: string = req.params.storeName;
+        const currentPage = Number(req.query.currentPage);
+        const perPage = Number(req.query.perPage);
 
         // Check if the store exists
         const stores: DB.Store[] = await knex<DB.Store>('Stores').where({ name });
@@ -124,7 +148,7 @@ export const storeProducts = async (req: Request, res: Response, next: NextFunct
             const store = stores[0];
 
             // @ts-ignore
-            const products: DB.Product[] = await knex<DB.Product>('Products').where({ storeId: store.storeId }).paginate({ perPage: 1, currentPage: 0 });
+            const products: DB.Product[] = await knex<DB.Product>('Products').where({ storeId: store.storeId }).paginate({ perPage: perPage, currentPage: currentPage});
             if (store) {
                 store.products = products;
             }
