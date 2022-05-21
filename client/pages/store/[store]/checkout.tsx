@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Button } from '../../../components/shared/Button';
 import styles from '../../../styles/Store.module.css';
 import { CartContext } from '../../context/CartContext';
@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { PaymentModal } from '../../../components/PaymentModal';
 
 const Checkout = () => {
-  const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment } =
+  const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment, orderDetails, orderTotal } =
     useContext(CartContext);
   
   const [email, setEmail] = useState('');
@@ -38,6 +38,18 @@ const Checkout = () => {
   const showModal = () => {
     setShowPaymentModal(true)
   }
+
+  useEffect(() => { 
+    if (orderDetails.orderId) {
+      let requestData = {
+        orderId: orderDetails.orderId,
+        orderTotal
+      }
+      handlePayment(requestData)
+    }
+  }, [
+    orderDetails.orderId, orderTotal
+  ])
 
   return (
     <section className={styles.container}>

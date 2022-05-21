@@ -76,20 +76,9 @@ export const CartContextProvider = ({ children }: Props) => {
 
   const handleCartCheckout = async (data: CheckoutRequestModel) => {
     setIsFetchingInvoice(true)
-    checkout(data)
-      .then((res) => {
-        setOrderDetails(res.data.data.orderDetails);
-        setOrderTotal(res.data.data.orderTotal);
-      })
-      .then((res) => {
-        if (orderDetails) {
-          let requestData = {
-            orderId: orderDetails.orderId,
-            orderTotal,
-          };
-          handlePayment(requestData)
-        }
-      });
+    let res = await checkout(data)
+    await setOrderDetails(res.data.data.orderDetails);
+    await setOrderTotal(res.data.data.orderTotal);
   };
 
   const handlePayment = async (data: PaymentRequestModel) => {
@@ -98,7 +87,10 @@ export const CartContextProvider = ({ children }: Props) => {
       orderTotal: data.orderTotal,
     };
     let res = await makePayment(req);
-    setAddresses(res.data.data);
+    console.log('handlePayment res ', res)
+    if (res?.data?.data) {
+      setAddresses(res.data.data);
+    }
     setIsFetchingInvoice(false)
     return res;
   };
