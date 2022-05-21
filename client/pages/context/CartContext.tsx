@@ -82,11 +82,13 @@ export const CartContextProvider = ({ children }: Props) => {
         setOrderTotal(res.data.data.orderTotal);
       })
       .then((res) => {
-        let requestData = {
-          orderId: orderDetails.orderId,
-          orderTotal,
-        };
-        handlePayment(requestData)
+        if (orderDetails) {
+          let requestData = {
+            orderId: orderDetails.orderId,
+            orderTotal,
+          };
+          handlePayment(requestData)
+        }
       });
   };
 
