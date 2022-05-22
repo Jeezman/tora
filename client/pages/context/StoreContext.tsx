@@ -40,6 +40,8 @@ export const StoreContextProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
   const [products, setProducts] = useState(defaultState.products);
 
+  const router = useRouter()
+
   useEffect(() => {
     const fetchStoreData = async () => {
       const res = await fetchStore();
@@ -49,7 +51,7 @@ export const StoreContextProvider = ({ children }: Props) => {
       }
     };
 
-    fetchStoreData();
+    if (router.pathname !== '/') fetchStoreData();
   }, []);
 
   const handleCreateStore = async (data: StoreRequestModel) => {
