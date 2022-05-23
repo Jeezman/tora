@@ -1,9 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { ConsolidatedLoginDetail, ConsolidatedRegisterDetail, LoginRequestModel, RegisterRequestModel } from '../pages/models/auth.model';
 
-// export const BASE_URL = 'http://localhost:5005/api/';
-// export const BASE_URL = 'http://localhost:5002/api/';
-export const BASE_URL = 'https://5dce-102-89-33-188.eu.ngrok.io/api/';
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 axios.defaults.baseURL = BASE_URL;
 

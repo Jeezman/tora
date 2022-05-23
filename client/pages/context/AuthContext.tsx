@@ -7,8 +7,7 @@ import { io } from 'socket.io-client';
 import { v4 } from 'uuid';
 import LoadingScreen from '../../components/shared/LoadingScreen';
 
-
-export const SOCKET_URL = 'ws://localhost:5005';
+export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || '';
 const socket = io(SOCKET_URL, {
   transports: ['websocket'],
   auth: {
@@ -57,6 +56,13 @@ export const AuthContextProvider = ({ children }: Props) => {
   const getEventsSocket = () => {
     socket.on('auth', (arg: any) => {
       console.log('socket connected ', arg)
+
+      if (arg.token) {
+        storeData('token', arg.token);
+        setIsLoading(false);
+        setIsLoggedIn(true)
+        router.push('/dashboard/');
+      }
     });
   };
   
