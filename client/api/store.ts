@@ -6,8 +6,14 @@ import {
   ProductRequestModel,
   StoreRequestModel,
 } from '../pages/models/store.model';
+import { getData } from '../util/storage';
 
 let token;
+// const getToken = async () => {
+//   let token = getData('token').then()
+//   return token;
+// }
+
 if (typeof window !== 'undefined') {
   token = window?.localStorage.getItem('@token');
 
@@ -18,6 +24,11 @@ if (typeof window !== 'undefined') {
 axios.defaults.baseURL = BASE_URL;
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+/**
+ * 
+ const instance = (token:string) => axios.create({   baseURL: `${config.API_URL}`,   timeout: 1000,   headers :{ 'authorization': 'Bearer ' + token } })
+ */
 
 type ServerError = {
   error: string;

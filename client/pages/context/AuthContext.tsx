@@ -1,8 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { login, register } from '../../api';
+import React, { useState, useEffect, useContext } from 'react';
+import Router, { useRouter } from 'next/router';
+import { login, loginWithLN, register } from '../../api';
 import { getData, storeData } from '../../util/storage';
 import { LoginRequestModel, RegisterRequestModel } from '../models/auth.model';
+import { io } from 'socket.io-client';
+import { v4 } from 'uuid';
+import LoadingScreen from '../../components/shared/LoadingScreen';
+
+
+export const SOCKET_URL = 'ws://localhost:5002';
+const socket = io(SOCKET_URL, {
+  transports: ['websocket'],
+  auth: {
+    'client-id': v4().substring(0, 10)
+  }
+});
+
+interface LNData {
+  encoded: string;
+  secret: string;
+  url: string;
+}
 
 interface Props {
   children: React.ReactNode;
@@ -13,13 +31,17 @@ interface IAuthContext {
   isLoading: boolean;
   handleLogin: (data: LoginRequestModel) => void;
   handleRegister: (data: RegisterRequestModel) => void;
+  handleLoginWithLN: () => void;
+  lnData: LNData;
 }
 
 const defaultState = {
   isLoggedIn: false,
   isLoading: false,
   handleLogin: (data: LoginRequestModel) => {},
-  handleRegister: (data: RegisterRequestModel) => {}
+  handleRegister: (data: RegisterRequestModel) => { },
+  handleLoginWithLN: () => { },
+  lnData: {encoded: "", secret: "", url: ""}
 };
 
 export const AuthContext = React.createContext<IAuthContext>(defaultState);
@@ -27,8 +49,20 @@ export const AuthContext = React.createContext<IAuthContext>(defaultState);
 export const AuthContextProvider = ({ children }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(defaultState.isLoggedIn);
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
+  const [lnAuth, setLnAuth] = useState({});
+  const [lnData, setLnData] = useState(defaultState.lnData);
 
   const router = useRouter();
+
+  const getEventsSocket = () => {
+    socket.on('auth', (arg: any) => {
+      console.log('socket connected ', arg)
+    });
+  };
+  
+  useEffect(() => {
+    getEventsSocket()
+  }, []);
 
   const handleLogin = async (data: LoginRequestModel) => {
     setIsLoading(true);
@@ -36,6 +70,7 @@ export const AuthContextProvider = ({ children }: Props) => {
     if (response.data) {
       const responseData = response?.data?.data;
       setIsLoading(false);
+      setIsLoggedIn(true)
       storeData('token', responseData.token);
       router.push('/dashboard/');
     } else {
@@ -54,18 +89,21 @@ export const AuthContextProvider = ({ children }: Props) => {
     }
   };
 
+  const handleLoginWithLN = async () => {
+    let response = await loginWithLN();
+    console.log('handleLoginWithLN response ', response.data);
+    setLnData(response.data)
+  }
   useEffect(() => {
     const _getData = async () => {
       let token = await getData('token')
-      console.log('token dey? ', token)
-      if (token) {
+      if (token && !isLoggedIn) {
         setIsLoggedIn(true)
-        // router.push('/dashboard')
+        router.push('/dashboard')
       }
     }
-    // let token = getData('token');
     _getData()
-  }, []);
+  }, [isLoggedIn]);
 
   const contextValue = {
     isLoggedIn,
@@ -73,9 +111,23 @@ export const AuthContextProvider = ({ children }: Props) => {
     isLoading,
     handleLogin,
     handleRegister,
+    lnData,
+    handleLoginWithLN,
+    lnAuth
   };
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
+};
+
+
+export const ProtectRoute = ({ children }: any) => {
+  const router = useRouter();
+
+  const { isLoading, isLoggedIn} = useContext(AuthContext)
+  if ( (!isLoggedIn && router.pathname !== '/' && !Boolean(router.query.store))) {
+    return <LoadingScreen />
+  }
+  return children;
 };
