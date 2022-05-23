@@ -7,6 +7,7 @@ import { hashPassword, verifyPassword } from '../helpers/password';
 import { signUser } from '../helpers/jwt';
 import { RequestUser } from '../interfaces';
 import ipToUser from '../helpers/ipToUser';
+import { emitSocketEvent } from '../app';
 
 // Controller for registering user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -139,3 +140,13 @@ export const updateUserDetails = async (req: Request, res: Response, next: NextF
         next(err);
     }
 };
+
+export const pseudoLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        console.log('GET /lnurl', { request: req.query });
+        emitSocketEvent.emit('auth', req.query)
+        res.json(req.query)
+    } catch (error) {
+        console.log('GET /lnurl error ', error)
+    }
+}
