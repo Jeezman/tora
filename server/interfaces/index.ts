@@ -1,6 +1,7 @@
 import { ValidationError } from "express-validator";
 import { DB } from "./Db";
-import { Request } from "express";
+import { request, Request } from "express";
+import { QuerystringParser } from "formidable/parsers";
 export interface DataResponse {
     msg: string;
     data: any;

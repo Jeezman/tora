@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import { AuthContextProvider } from './context/AuthContext';
+import { AuthContextProvider, ProtectRoute } from './context/AuthContext';
 import { DashboardContextProvider } from './context/DashboardContext';
 import { StoreContextProvider } from './context/StoreContext';
 import { CartContextProvider } from './context/CartContext';
@@ -13,9 +13,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       <DashboardContextProvider>
         <StoreContextProvider>
           <CartContextProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <ProtectRoute>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </ProtectRoute>
           </CartContextProvider>
         </StoreContextProvider>
       </DashboardContextProvider>

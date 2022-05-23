@@ -16,6 +16,22 @@ const server = http.createServer(app);
 // Create Tora wallet
 walletCheck();
 
+
+const io = require('socket.io')(server);
+let emitSocketEvent: any;
+
+io.on('connection', (socket:any) => {
+    console.log('a user connected')
+
+    socket.on('disconnect', () => {
+        console.log('User Disconnect');
+    });
+
+    emitSocketEvent = socket;
+})
+
+export {emitSocketEvent}
+
 // App middlewares
 app.use(cors());
 app.use(bodyParser.json());
