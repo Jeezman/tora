@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { ConsolidatedLoginDetail, ConsolidatedRegisterDetail, LoginRequestModel, RegisterRequestModel } from '../pages/models/auth.model';
 
-export const BASE_URL = 'http://localhost:5002/api/';
+export const BASE_URL = 'http://localhost:5005/api/';
 
 axios.defaults.baseURL = BASE_URL;
 

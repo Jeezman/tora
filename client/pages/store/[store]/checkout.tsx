@@ -47,9 +47,7 @@ const Checkout = () => {
       }
       handlePayment(requestData)
     }
-  }, [
-    orderDetails.orderId, orderTotal
-  ])
+  }, [orderDetails.orderId, orderTotal])
 
   return (
     <section className={styles.container}>

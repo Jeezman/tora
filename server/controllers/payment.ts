@@ -6,7 +6,8 @@ import { responseSuccess, responseErrorValidation, responseError } from '../help
 import { v4 } from 'uuid';
 import bitcoinq from '../bitcoinqueries';
 import { addressType } from '../interfaces/Address';
-import {createInvoice} from '../helpers/paymentHelper'
+import {createInvoice} from '../helpers/paymentHelper';
+import 'dotenv/config';
 
 // Controller to generate lightning invoice and Bitcoin address
 export const generateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
