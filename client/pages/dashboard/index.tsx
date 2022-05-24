@@ -7,11 +7,14 @@ import { useRouter } from 'next/router';
 import { Button } from '../../components/shared/Button';
 import { Dialog, Transition } from '@headlessui/react';
 import { DashboardContext } from '../context/DashboardContext';
+import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
 function Dashboard() {
   const router = useRouter();
   const { handleCreateStore } = useContext(DashboardContext);
   const [addStoreModal, setAddStoreModal] = useState(false);
 
+  const data = useGetBTCPrice({amount: 50});
+  console.log('Dashboard Data ', data);
   const handleCloseAddStoreModal = () => setAddStoreModal(false);
   const onCreateStore = (name: string) => {
     handleCreateStore({ name: name });

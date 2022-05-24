@@ -8,9 +8,9 @@ const storeData = async (key: string, value: string) => {
   }
 };
 
-const getData = async (key: string) => {
+const getData =  (key: string) => {
   try {
-      const jsonValue = await window.localStorage.getItem(`@${key}`);
+      const jsonValue =  window.localStorage.getItem(`@${key}`);
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
     console.log('AsyncStorage get error ', e);

@@ -9,10 +9,10 @@ import {
 import { getData } from '../util/storage';
 
 let token;
-// const getToken = async () => {
-//   let token = getData('token').then()
-//   return token;
-// }
+const getToken = () => {
+  let token = getData('token')
+  return token;
+}
 
 if (typeof window !== 'undefined') {
   token = window?.localStorage.getItem('@token');
@@ -23,7 +23,7 @@ if (typeof window !== 'undefined') {
 }
 axios.defaults.baseURL = BASE_URL;
 
-axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+axios.defaults.headers.common['Authorization'] = `Bearer ${getToken()}`;
 
 /**
  * 

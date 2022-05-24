@@ -6,6 +6,7 @@ import { LoginRequestModel, RegisterRequestModel } from '../models/auth.model';
 import { io } from 'socket.io-client';
 import { v4 } from 'uuid';
 import LoadingScreen from '../../components/shared/LoadingScreen';
+import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
 
 export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || '';
 const socket = io(SOCKET_URL, {
@@ -103,7 +104,7 @@ export const AuthContextProvider = ({ children }: Props) => {
   useEffect(() => {
     const _getData = async () => {
       let token = await getData('token')
-      if (token && !isLoggedIn) {
+      if (token && !isLoggedIn && router.pathname !== '/store/[store]') {
         setIsLoggedIn(true)
         router.push('/dashboard')
       }

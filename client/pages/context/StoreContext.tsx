@@ -45,13 +45,13 @@ export const StoreContextProvider = ({ children }: Props) => {
   useEffect(() => {
     const fetchStoreData = async () => {
       const res = await fetchStore();
-      let token = await getData('token');
-      if (token) {
-        setStoreName(res?.data[0]?.name);
+      let token = getData('token');
+      if (!!token) {
+        if (res?.data.length > 0) setStoreName(res?.data[0]?.name);
       }
     };
 
-    if (router.pathname !== '/') fetchStoreData();
+    if (router.pathname !== '/' && router.pathname !== '/store/[store]') fetchStoreData();
   }, []);
 
   const handleCreateStore = async (data: StoreRequestModel) => {
