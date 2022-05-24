@@ -51,11 +51,12 @@ const Checkout = () => {
       let requestData = {
         orderId: orderDetails.orderId,
         orderTotal,
+        bitcoins: data.usdToBTC.toFixed(4),
         sats: data.usdToSats
       }
       handlePayment(requestData)
     }
-  }, [orderDetails.orderId, orderTotal])
+  }, [data.usdToBTC, data.usdToSats, handlePayment, orderDetails.orderId, orderTotal])
 
   return (
     <section className={styles.container}>

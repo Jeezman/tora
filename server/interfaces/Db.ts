@@ -93,6 +93,8 @@ export namespace DB {
         paymentId: string;
         orderId: string;
         totalAmount: number;
+        amountInBtc?: number;
+        amountInSats?: number;
         invoice: string;
         address: string;
         date_created?: string;
@@ -119,6 +121,6 @@ export namespace DB {
         lninvoice?: string;
         status: number;
         type: string;
-        userid?: number;
+        userId?: number;
     }
 }

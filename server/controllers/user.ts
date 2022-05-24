@@ -114,7 +114,7 @@ export const updateUserDetails = async (req: Request, res: Response, next: NextF
     }
 };
 
-// Controller for user login
+// Controller for getting a user's balance
 export const userBalance = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         // Finds the validation errors in this request and wraps them in an object with handy functions
@@ -129,6 +129,26 @@ export const userBalance = async (req: Request, res: Response, next: NextFunctio
         const userBalance: DB.UserWallet | undefined = await knex<DB.UserWallet>('UserWallet').where({ userId: reqUser.user.userId }).first();
 
         return responseSuccess(res, 201, 'Successfully fetch user balance', userBalance);
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Controller for getting a user's transactions
+export const userTransactions = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const reqUser = req as RequestUser;
+
+        const transactions: DB.TransactionLogs[] = await knex<DB.TransactionLogs>('Transactions').where({ userId: reqUser.user.userId });
+
+        return responseSuccess(res, 201, 'Successfully fetch user balance', transactions);
     } catch (err) {
         next(err);
     }

@@ -19,7 +19,8 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
 
         const orderId: string = req.params.orderId;
         const totalAmount: number = req.body.orderTotal;
-        const priceInSats: number = req.body.sats;
+        const amountInBtc: number = req.body.bitcoins;
+        const amountInSats: number = req.body.sats;
 
         if (totalAmount < 0) throw new Error("amount out of range");
 
@@ -27,7 +28,7 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
         const bitcoinAddress = await createAddress();
 
         // Generate Lightning Invoice
-        const lnInvoice: AddInvoiceResponse = await createInvoice(Math.round(priceInSats), process.env.DEFAULT_EXPIRY);
+        const lnInvoice: AddInvoiceResponse = await createInvoice(Math.round(amountInSats), process.env.DEFAULT_EXPIRY);
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
@@ -38,7 +39,8 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
             return responseError(res, 404, 'Not a valid order');
         }
 
-        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest, totalAmount });
+        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest, totalAmount, amountInBtc, amountInSats });
+
         await knex<DB.OrderInvoiceLog>('OrderInvoiceLogs').insert({ paymentId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest });
 
         const data = {

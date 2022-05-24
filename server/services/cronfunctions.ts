@@ -7,10 +7,13 @@ import { DB } from '../interfaces/Db';
 const noOfCon = Number(process.env.NO_OF_CONFIRMATIONS);
 
 // Update Balance and Transaction logs
-export const updateBalanceAndTransaction = async (userId: number | undefined, txid: string, amount: number) => {
+export const updateBalanceAndTransaction = async (userId: number, address: string, txid: string, amount: number) => {
     try {
         // Update the User's Balance with the transaction amount
         await knex<DB.UserWallet>('UserWallet').update({ balance: knex.raw(`balance + ${amount}`) }).where({ userId: userId });
+
+        // Update the OrderPayments
+        await knex<DB.OrderPayment>('OrderPayments').where({ address }).update({ status: 'settled' });
 
         // Update the transaction status in transaction log
         await knex<DB.TransactionLogs>('Transactions').update({ status: 1 }).where({ txid: txid });
@@ -53,7 +56,7 @@ export const getReceived = async () => {
                             txid: trans.txid,
                             status: 0,
                             type: trans.category,
-                            userid: userId
+                            userId: userId
                         });
                     }
                 }
@@ -61,13 +64,13 @@ export const getReceived = async () => {
                 // If the transaction meets the confirmation target
                 if (trans.confirmations === noOfCon && Number(alltrans[0].status) === 0) {
                     // Update transaction logs and balance
-                    await updateBalanceAndTransaction(userId, trans.txid, orderPayment[0].totalAmount);
+                    await updateBalanceAndTransaction(userId, orderAddress, trans.txid, orderPayment[0].totalAmount);
 
                 } else if (trans.confirmations > noOfCon) {
                     // If the confirmation is greater than no of confirmation and it is not existent in our users transaction logs
                     if (alltrans.length === 1 && Number(alltrans[0].status) === 0) {
                         // Update transaction logs and balance
-                        await updateBalanceAndTransaction(userId, trans.txid, orderPayment[0].totalAmount);
+                        await updateBalanceAndTransaction(userId, orderAddress, trans.txid, orderPayment[0].totalAmount);
                     }
                 }
             }
