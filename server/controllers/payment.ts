@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
-import {createInvoice, createAddress} from '../helpers/paymentHelper';
+import {createInvoice, createAddress, subscribeToInvoice} from '../helpers/paymentHelper';
 import 'dotenv/config';
 import { AddInvoiceResponse } from '@radar/lnrpc';
 
@@ -45,6 +45,8 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
             bitcoinAddress,
             lnInvoice: lnInvoice.paymentRequest
         };
+
+        subscribeToInvoice(lnInvoice)
 
         return responseSuccess(res, 200, 'Successfully created payment address and invoice', data);
 
