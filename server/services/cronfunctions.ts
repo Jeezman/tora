@@ -10,7 +10,7 @@ const noOfCon = Number(process.env.NO_OF_CONFIRMATIONS);
 export const updateBalanceAndTransaction = async (userId: number | undefined, txid: string, amount: number) => {
     try {
         // Update the User's Balance with the transaction amount
-        await knex<DB.UserBalance>('UserWallet').update({ balance: knex.raw(`balance + ${amount}`) }).where({ userId: userId });
+        await knex<DB.UserWallet>('UserWallet').update({ balance: knex.raw(`balance + ${amount}`) }).where({ userId: userId });
 
         // Update the transaction status in transaction log
         await knex<DB.TransactionLogs>('Transactions').update({ status: 1 }).where({ txid: txid });

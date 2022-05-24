@@ -106,7 +106,7 @@ export namespace DB {
         date_created?: string;
     }
 
-    export interface UserBalance {
+    export interface UserWallet {
         id?: number;
         userId: number;
         balance: number;

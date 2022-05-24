@@ -82,7 +82,7 @@ const updateBalanceAndTransaction = async (
 ) => {
   try {
     // Update the User's Balance with the transaction amount
-    await knex<DB.UserBalance>('UserWallet')
+    await knex<DB.UserWallet>('UserWallet')
       .update({ balance: knex.raw(`balance + ${amount}`) })
       .where({ userId: userId });
   } catch (err) {
