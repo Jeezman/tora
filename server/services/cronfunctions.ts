@@ -7,7 +7,7 @@ import { DB } from '../interfaces/Db';
 const noOfCon = Number(process.env.NO_OF_CONFIRMATIONS);
 
 // Update Balance and Transaction logs
-const updateBAndT = async (userId: number | undefined, txid: string, amount: number) => {
+const updateBalanceAndTransaction = async (userId: number | undefined, txid: string, amount: number) => {
     try {
         // Update the User's Balance with the transaction amount
         await knex<DB.UserBalance>('UserWallet').update({ amount: knex.raw(`balance + ${amount}`) }).where({ userId: userId });
@@ -61,13 +61,13 @@ export const getReceived = async () => {
                 // If the transaction meets the confirmation target
                 if (trans.confirmations === noOfCon && Number(alltrans[0].status) === 0) {
                     // Update transaction logs and balance
-                    await updateBAndT(userId, trans.txid, orderPayment[0].totalAmount);
+                    await updateBalanceAndTransaction(userId, trans.txid, orderPayment[0].totalAmount);
 
                 } else if (trans.confirmations > noOfCon) {
                     // If the confirmation is greater than no of confirmation and it is not existent in our users transaction logs
                     if (alltrans.length === 1 && Number(alltrans[0].status) === 0) {
                         // Update transaction logs and balance
-                        await updateBAndT(userId, trans.txid, orderPayment[0].totalAmount);
+                        await updateBalanceAndTransaction(userId, trans.txid, orderPayment[0].totalAmount);
                     }
                 }
             }
