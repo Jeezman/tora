@@ -12,7 +12,7 @@ export const createInvoice = async (
   const rpc = await lndClient;
 
   const invoice = await rpc.addInvoice({
-    value: String(amount),
+    value: amount.toString(),
     expiry,
   });
 

@@ -27,8 +27,7 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
         const bitcoinAddress = await createAddress();
 
         // Generate Lightning Invoice
-        console.log('price in sats is ', priceInSats)
-        const lnInvoice: AddInvoiceResponse = await createInvoice(priceInSats, process.env.DEFAULT_EXPIRY);
+        const lnInvoice: AddInvoiceResponse = await createInvoice(Math.round(priceInSats), process.env.DEFAULT_EXPIRY);
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
