@@ -42,8 +42,8 @@ export const getReceived = async () => {
                 const store: DB.Store[] = await knex<DB.Store>('Stores').where({ storeId });
                 const userId: number | undefined = store[0].userId;
 
-                 // Check if the transaction has been added to the database log, if not add it
-                 const alltrans: DB.TransactionLogs[] = await knex<DB.TransactionLogs>('Transactions').where({ txid: trans.txid });
+                // Check if the transaction has been added to the database log, if not add it
+                const alltrans: DB.TransactionLogs[] = await knex<DB.TransactionLogs>('Transactions').where({ txid: trans.txid });
 
                 // If the transaction is a receive category
                 if (trans.category === 'receive') {
@@ -61,13 +61,13 @@ export const getReceived = async () => {
                 // If the transaction meets the confirmation target
                 if (trans.confirmations === noOfCon && Number(alltrans[0].status) === 0) {
                     // Update transaction logs and balance
-                    await updateBAndT(userId, trans.txid, trans.amount);
+                    await updateBAndT(userId, trans.txid, orderPayment[0].totalAmount);
 
                 } else if (trans.confirmations > noOfCon) {
                     // If the confirmation is greater than no of confirmation and it is not existent in our users transaction logs
                     if (alltrans.length === 1 && Number(alltrans[0].status) === 0) {
                         // Update transaction logs and balance
-                        await updateBAndT(userId, trans.txid, trans.amount);
+                        await updateBAndT(userId, trans.txid, orderPayment[0].totalAmount);
                     }
                 }
             }
