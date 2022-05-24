@@ -96,6 +96,7 @@ export namespace DB {
         invoice: string;
         address: string;
         date_created?: string;
+        status: string;
     }
 
     export interface OrderInvoiceLog {
@@ -108,7 +109,7 @@ export namespace DB {
     export interface UserBalance {
         id?: number;
         userId: number;
-        amount: number;
+        balance: number;
     }
     
     export interface TransactionLogs {

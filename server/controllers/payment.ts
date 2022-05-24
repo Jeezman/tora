@@ -6,6 +6,7 @@ import { responseSuccess, responseErrorValidation, responseError } from '../help
 import { v4 } from 'uuid';
 import {createInvoice, createAddress} from '../helpers/paymentHelper';
 import 'dotenv/config';
+import { AddInvoiceResponse } from '@radar/lnrpc';
 
 // Controller to generate lightning invoice and Bitcoin address
 export const generateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -26,7 +27,8 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
         const bitcoinAddress = await createAddress();
 
         // Generate Lightning Invoice
-        const lnInvoice: string = await createInvoice(priceInSats, process.env.DEFAULT_EXPIRY);
+        console.log('price in sats is ', priceInSats)
+        const lnInvoice: AddInvoiceResponse = await createInvoice(priceInSats, process.env.DEFAULT_EXPIRY);
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
@@ -37,12 +39,12 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
             return responseError(res, 404, 'Not a valid order');
         }
 
-        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice, totalAmount });
-        await knex<DB.OrderInvoiceLog>('OrderInvoiceLogs').insert({ paymentId, address: bitcoinAddress, invoice: lnInvoice });
+        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest, totalAmount });
+        await knex<DB.OrderInvoiceLog>('OrderInvoiceLogs').insert({ paymentId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest });
 
         const data = {
             bitcoinAddress,
-            lnInvoice
+            lnInvoice: lnInvoice.paymentRequest
         };
 
         return responseSuccess(res, 200, 'Successfully created payment address and invoice', data);

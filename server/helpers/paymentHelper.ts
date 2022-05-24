@@ -1,21 +1,92 @@
+import { AddInvoiceResponse } from '@radar/lnrpc';
 import lndClient from '../config/lnd';
 import bitcoin from '../bitcoinqueries';
 import { addressType } from '../interfaces/Address';
+import { DB } from '../interfaces/Db';
+import knex from '../db/knex';
 
-export const createInvoice = async (amount: number = 0, expiry: string | undefined): Promise<string> => {
-    const rpc = await lndClient;
+export const createInvoice = async (
+  amount: number = 0,
+  expiry: string | undefined
+): Promise<AddInvoiceResponse> => {
+  const rpc = await lndClient;
 
-    const invoice = await rpc.addInvoice({
-        value: JSON.stringify(amount),
-        expiry
-    });
+  const invoice = await rpc.addInvoice({
+    value: String(amount),
+    expiry,
+  });
 
-    return invoice.paymentRequest;
-
+  return invoice;
 };
 
 export const createAddress = async (): Promise<string> => {
-    const { data }  = await bitcoin.addresses.getNewAddress('paymentaddress',  addressType.bech32, 'torawallet');
-    const address = data.result;
-    return address;
-}
+  const { data } = await bitcoin.addresses.getNewAddress(
+    'paymentaddress',
+    addressType.bech32,
+    'torawallet'
+  );
+  const address = data.result;
+  return address;
+};
+
+export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
+  const rpc = await lndClient;
+
+  // Get the lightning invoice;
+  const orderPayment: DB.OrderPayment[] = await knex<DB.OrderPayment>(
+    'OrderPayments'
+  ).where({ invoice: invoice.paymentRequest });
+
+  if (orderPayment.length === 1) {
+    const orderId = orderPayment[0].orderId;
+
+    const subscribe = await rpc.subscribeInvoices({
+      addIndex: invoice.addIndex,
+    });
+
+    subscribe.on('data', async (response) => {
+      if (response.settled) {
+        // get the order
+        const order: DB.Order[] = await knex<DB.Order>('Order').where({
+          orderId,
+        });
+        const storeId: number = order[0].storeId;
+
+        // Get the store
+        const store: DB.Store[] = await knex<DB.Store>('Stores').where({
+          storeId,
+        });
+        const userId: number | undefined = store[0].userId;
+
+        // Get the payment address;
+        const orderPayment: DB.OrderPayment[] = await knex<DB.OrderPayment>(
+          'OrderPayments'
+        ).where({ address: invoice.paymentRequest });
+
+        // check if transaction has been settled
+        const transaction: DB.OrderPayment[] = await knex<DB.OrderPayment>(
+          'OrderPayments'
+        ).where({ invoice: invoice.paymentRequest });
+
+        if (transaction[0].status !== 'settled') {
+          updateBalanceAndTransaction(userId, orderPayment[0].totalAmount);
+        }
+      }
+    });
+  }
+};
+
+const updateBalanceAndTransaction = async (
+  userId: number | undefined,
+  amount: number
+) => {
+  try {
+    // Update the User's Balance with the transaction amount
+    await knex<DB.UserBalance>('UserWallet')
+      .update({ balance: knex.raw(`balance + ${amount}`) })
+      .where({ userId: userId });
+  } catch (err) {
+    // Log Error
+    console.log('Update Balance Error ===', (err as Error).message);
+  }
+};
