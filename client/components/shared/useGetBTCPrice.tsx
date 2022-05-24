@@ -23,20 +23,27 @@ interface Price {
     websiteUrl:      string;
     twitterUrl:      string;
     exp:             string[];
+};
+
+interface iCoins {
+    coins: Price[]
+}
+
+const defaultState:iCoins = {
+    coins: []
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export const useGetBTCPrice = ({ amount }: Props) => {
-    const [fetchedData, setFetchedData] = useState({coins: []})
-    const { data, error } = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, {refreshInterval: 3000} );
+    // const [fetchedData, setFetchedData] = useState(defaultState.coins)
+    const { data, error } = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, {refreshInterval: 30000} );
 
     console.log('data is ', data)
+    console.log('price is ', data?.coins[0].price)
+    console.log('amount is ',amount)
 
-    setFetchedData(data);
-
-    // @ts-ignore
-    let price = fetchedData?.coins[0].price; 
+    let price = data?.coins[0].price; 
     let usdToBTC = amount * 1 / price;
     let usdToSats = usdToBTC * 100000000;
     return {

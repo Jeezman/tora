@@ -32,6 +32,7 @@ export interface CheckoutRequestResponse {
 export interface PaymentRequestModel {
     orderId: string;
     orderTotal: number;
+    sats: number
 } 
 
 export interface PaymentRequestResponse {

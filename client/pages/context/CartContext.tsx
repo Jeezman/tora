@@ -6,12 +6,24 @@ import {
   CheckoutRequestModel,
   OrderDetailsModel,
   PaymentRequestResponse,
-  PaymentRequestModel
+  PaymentRequestModel,
 } from '../models/cart.model';
 
 interface Props {
   children: React.ReactNode;
 }
+
+export interface CartItems {
+    cartId:        string;
+    productId:     number;
+    buyerPubKey:   null;
+    buyerUsername: string;
+    amount:        number;
+    itemCount:     number;
+    total:         number;
+    storeId:       number;
+}
+
 
 interface ICartContext {
   isLoading: boolean;
@@ -19,12 +31,12 @@ interface ICartContext {
   handleFetchCart: () => void;
   handlePayment: (data: PaymentRequestModel) => void;
   handleCartCheckout: (data: CheckoutRequestModel) => void;
-  cartItems: any[];
+  cartItems: CartItems[];
   order: any[];
   orderDetails: OrderDetailsModel;
   orderTotal: number;
-  addresses: PaymentRequestResponse,
-  isFetchingInvoice: boolean
+  addresses: PaymentRequestResponse;
+  isFetchingInvoice: boolean;
 }
 
 const defaultState = {
@@ -43,10 +55,10 @@ const defaultState = {
   },
   orderTotal: 0,
   addresses: {
-    bitcoinAddress: "",
-    lnInvoice: ""
+    bitcoinAddress: '',
+    lnInvoice: '',
   },
-  isFetchingInvoice: false
+  isFetchingInvoice: false,
 };
 
 export const CartContext = React.createContext<ICartContext>(defaultState);
@@ -58,7 +70,9 @@ export const CartContextProvider = ({ children }: Props) => {
   const [orderDetails, setOrderDetails] = useState(defaultState.orderDetails);
   const [orderTotal, setOrderTotal] = useState(defaultState.orderTotal);
   const [addresses, setAddresses] = useState(defaultState.addresses);
-  const [isFetchingInvoice, setIsFetchingInvoice] = useState(defaultState.isFetchingInvoice)
+  const [isFetchingInvoice, setIsFetchingInvoice] = useState(
+    defaultState.isFetchingInvoice
+  );
 
   const router = useRouter();
 
@@ -75,8 +89,8 @@ export const CartContextProvider = ({ children }: Props) => {
   const handleClearCart = () => {};
 
   const handleCartCheckout = async (data: CheckoutRequestModel) => {
-    setIsFetchingInvoice(true)
-    let res = await checkout(data)
+    setIsFetchingInvoice(true);
+    let res = await checkout(data);
     await setOrderDetails(res.data.data.orderDetails);
     await setOrderTotal(res.data.data.orderTotal);
   };
@@ -85,13 +99,14 @@ export const CartContextProvider = ({ children }: Props) => {
     let req = {
       orderId: data.orderId,
       orderTotal: data.orderTotal,
+      sats: data.sats,
     };
     let res = await makePayment(req);
-    console.log('handlePayment res ', res)
+    console.log('handlePayment res ', res);
     if (res?.data?.data) {
       setAddresses(res.data.data);
     }
-    setIsFetchingInvoice(false)
+    setIsFetchingInvoice(false);
     return res;
   };
 

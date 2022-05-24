@@ -5,6 +5,7 @@ import { CartContext } from '../../context/CartContext';
 import { CheckoutRequestModel } from '../../models/cart.model';
 import { useRouter } from 'next/router';
 import { PaymentModal } from '../../../components/PaymentModal';
+import { useGetBTCPrice } from '../../../components/shared/useGetBTCPrice';
 
 const Checkout = () => {
   const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment, orderDetails, orderTotal } =
@@ -14,6 +15,12 @@ const Checkout = () => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+
+  console.log('order total ', orderTotal);
+
+  const data = useGetBTCPrice({ amount: cartItems[0]?.total || 0 })
+  
+  console.log('sats data ', data)
 
   const router = useRouter();
   
@@ -43,7 +50,8 @@ const Checkout = () => {
     if (orderDetails.orderId) {
       let requestData = {
         orderId: orderDetails.orderId,
-        orderTotal
+        orderTotal,
+        sats: data.usdToSats
       }
       handlePayment(requestData)
     }
