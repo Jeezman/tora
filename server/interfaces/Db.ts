@@ -104,4 +104,20 @@ export namespace DB {
         address: string;
         date_created?: string;
     }
+
+    export interface UserBalance {
+        id?: number;
+        userId: number;
+        amount: number;
+    }
+    
+    export interface TransactionLogs {
+        id?: number;
+        amount: number;
+        txid?: string;
+        lninvoice?: string;
+        status: number;
+        type: string;
+        userid?: number;
+    }
 }
