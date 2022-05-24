@@ -46,7 +46,7 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
             lnInvoice: lnInvoice.paymentRequest
         };
 
-        subscribeToInvoice(lnInvoice)
+        subscribeToInvoice(lnInvoice);
 
         return responseSuccess(res, 200, 'Successfully created payment address and invoice', data);
 

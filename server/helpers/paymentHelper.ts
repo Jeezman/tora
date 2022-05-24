@@ -39,7 +39,7 @@ export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
     'OrderPayments'
   ).where({ invoice: invoice.paymentRequest });
 
-  console.log('if orderPayments ', orderPayment)
+  console.log('if orderPayments ', orderPayment);
 
   if (orderPayment.length === 1) {
     const orderId = orderPayment[0].orderId;
