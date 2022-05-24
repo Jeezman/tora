@@ -9,6 +9,7 @@ import LoadingScreen from '../../components/shared/LoadingScreen';
 import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
 
 export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || '';
+
 const socket = io(SOCKET_URL, {
   transports: ['websocket'],
   auth: {
