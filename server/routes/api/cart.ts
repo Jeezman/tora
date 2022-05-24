@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { deleteFromCart, addToCart, updateCart, listCart, cartCheckout, deleteAllFromCart } from '../../controllers/cart';
-import { authUser } from '../../helpers/auth';
 const router = Router();
 
 router.post('/add', addToCart);

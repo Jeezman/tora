@@ -64,9 +64,11 @@ export namespace DB {
     export interface Order {
         id?: number;
         orderId: string;
+        storeId: number;
         user: string;
         status: string;
         date_created?: string;
+        orderTotal: number;
     }
 
     export interface OrderItems {
@@ -84,5 +86,38 @@ export namespace DB {
         address: string;
         email: string;
         phoneNumber: string;
+    }
+
+    export interface OrderPayment {
+        id?: number;
+        paymentId: string;
+        orderId: string;
+        totalAmount: number;
+        invoice: string;
+        address: string;
+        date_created?: string;
+    }
+
+    export interface OrderInvoiceLog {
+        paymentId: string;
+        invoice: string;
+        address: string;
+        date_created?: string;
+    }
+
+    export interface UserBalance {
+        id?: number;
+        userId: number;
+        amount: number;
+    }
+    
+    export interface TransactionLogs {
+        id?: number;
+        amount: number;
+        txid?: string;
+        lninvoice?: string;
+        status: number;
+        type: string;
+        userid?: number;
     }
 }

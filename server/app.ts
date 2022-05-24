@@ -2,16 +2,36 @@ import express, { Application, Response, Request, NextFunction } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import http from 'http';
-import dotenv from 'dotenv';
 import routes from './routes';
 import { responseError } from './helpers';
 import passport from 'passport';
 import session from 'express-session';
 import initializePassport from './helpers/passport';
-dotenv.config();
+import { walletCheck } from './services/wallet';
+import { cron } from './services/cron';
+import 'dotenv/config';
 
 const app: Application = express();
 const server = http.createServer(app);
+
+// Create Tora wallet
+walletCheck();
+cron();
+
+const io = require('socket.io')(server);
+let emitSocketEvent: any;
+
+io.on('connection', (socket:any) => {
+    console.log('a user connected')
+
+    socket.on('disconnect', () => {
+        console.log('User Disconnect');
+    });
+
+    emitSocketEvent = socket;
+})
+
+export {emitSocketEvent}
 
 // App middlewares
 app.use(cors());

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { ConsolidatedLoginDetail, ConsolidatedRegisterDetail, LoginRequestModel, RegisterRequestModel } from '../pages/models/auth.model';
 
-export const BASE_URL = 'http://localhost:5002/api/';
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 axios.defaults.baseURL = BASE_URL;
 
@@ -56,3 +56,18 @@ export const register = async (params:RegisterRequestModel): Promise<Consolidate
     return error.response.data;
   }
 };
+
+export const loginWithLN = async (): Promise<any> => {
+  try {
+    const res = await axios.get('user/login-lnurl');
+    return res;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const serverError = error as AxiosError<ServerError>;
+      if (serverError && serverError.response) {
+        return serverError.response.data;
+      }
+    }
+    console.log('calling error ', error);
+  }
+}

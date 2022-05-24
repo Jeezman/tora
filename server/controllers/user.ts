@@ -6,7 +6,8 @@ import { responseSuccess, responseErrorValidation, responseError } from '../help
 import { hashPassword, verifyPassword } from '../helpers/password';
 import { signUser } from '../helpers/jwt';
 import { RequestUser } from '../interfaces';
-import ipToUser from '../helpers/ipToUser';
+import lnurlServer from '../helpers/lnurl';
+import { emitSocketEvent } from '../app';
 
 // Controller for registering user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -19,20 +20,11 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
         const email: string = req.body.email;
         const pass: string = req.body.password;
-        const publicKey: string = req.body.publicKey;
 
         let user: DB.User[] = [];
-        if (publicKey) {
-            user = await knex<DB.User>('Users').where({ publicKey });
-            if (user.length > 0) {
-                return responseError(res, 404, 'User already exists');
-            }
-
-            await knex<DB.User>('Users').insert({ publicKey });
-            return responseSuccess(res, 200, 'Successfully created user', {});
-        }
 
         user = await knex<DB.User>('Users').where({ email });
+
         if (user.length > 0) {
             return responseError(res, 404, 'User already exists');
         }
@@ -59,26 +51,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
         const email: string = req.body.email;
         const pass: string = req.body.password;
-        const publicKey: string = req.body.publicKey;
-
-        if (publicKey) {
-            const users: DB.User[] = await knex<DB.User>('Users').where({ publicKey });
-
-            if (users.length > 0) {
-                let user = users[0];
-
-                // Delete user password and pk
-                delete user.password;
-                delete user.publicKey;
-
-                const token = signUser(user);
-
-                // Add token to user object
-                user.token = token;
-
-                return responseSuccess(res, 200, 'Successfully login', user);
-            }
-        }
 
         const users: DB.User[] = await knex<DB.User>('Users').where({ email });
 
@@ -91,7 +63,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
             // Delete user password and pk
             delete user.password;
-            delete user.publicKey;
 
             const token = signUser(user);
 
@@ -139,3 +110,45 @@ export const updateUserDetails = async (req: Request, res: Response, next: NextF
         next(err);
     }
 };
+
+export const lnurlLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const result = await lnurlServer.generateNewUrl("login");
+
+        res.send(result);
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const pseudoLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        const query = req.query;
+        if (query.key) {
+            const key: string = String(query.key);
+
+            // Check if user exists in the database;
+            const users: DB.User[] = await knex<DB.User>('Users').where({ publicKey: key });
+
+            if(users.length === 0) {
+                await knex<DB.User>('Users').insert({ publicKey: key });
+            }
+
+            // Get user again for token
+            const usersToken: DB.User[] = await knex<DB.User>('Users').where({ publicKey: key });
+            let user = usersToken[0];
+
+            // Delete user password and pk
+            delete user.password;
+          
+            const token = signUser(user);
+
+            emitSocketEvent.emit('auth', { key, token });
+            res.json({ key });
+        } else {
+            return responseError(res, 404, 'Unsuccesful LNURL AUTH login'); 
+        }
+    } catch (err) {
+        next(err);
+    }
+}

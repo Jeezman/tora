@@ -4,7 +4,6 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
-import { RequestUser } from '../interfaces';
 
 // Controller for adding to cart
 export const addToCart = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -188,28 +187,42 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
         const email: string = req.body.email;
         const phoneNumber: string = req.body.phoneNumber;
         const address: string = req.body.address;
+        const storeName: string = req.body.storeName;
 
         const orderId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
+        // Get storeId
+        const stores: DB.Store[] = await knex<DB.Store>('Stores').where({ name: storeName });
+
+        if (stores.length === 0) return responseError(res, 404, 'Store not found');
+
+        // Get storeId
+        const storeId = stores[0].storeId;
+
+        // Get all items with cartId
+        const cartItems: DB.Cart[] = await knex<DB.Cart>('Carts').where({ cartId });
+
+        // Map cart data to order
+        const orderItems = cartItems.map(item => {
+            return {
+                user: phoneNumber,
+                orderId,
+                productId: item.productId,
+                itemAmount: item.amount,
+                itemCount: item.itemCount,
+                itemTotal: item.total,
+                storeId: item.storeId,
+            }
+        });
+
+        // Get the order total
+        const orderTotal = orderItems.reduce((partial, item) => partial + item.itemTotal, 0);
+
         // Insert orderId in the database
-        await knex<DB.Order>('Order').insert({ orderId, user: phoneNumber })
+        await knex<DB.Order>('Order').insert({ orderId, user: phoneNumber, storeId, orderTotal })
             .returning('orderId')
             .then(async () => {
-                // Get all items with cartId
-                const cartItems: DB.Cart[] = await knex<DB.Cart>('Carts').where({ cartId });
 
-                // Map cart data to order
-                const orderItems = cartItems.map(item => {
-                    return {
-                        user: phoneNumber,
-                        orderId,
-                        productId: item.productId,
-                        itemAmount: item.amount,
-                        itemCount: item.itemCount,
-                        itemTotal: item.total,
-                        storeId: item.storeId,
-                    }
-                });
 
                 const orderDetails = {
                     orderId,
@@ -229,9 +242,6 @@ export const cartCheckout = async (req: Request, res: Response, next: NextFuncti
 
                 // delete all from cart
                 await knex<DB.Cart>('Carts').where({ cartId }).delete();
-
-                // Get the order total
-                const orderTotal = orderItems.reduce((partial, item) => partial + item.itemTotal, 0);
 
                 const data = {
                     orderTotal,
