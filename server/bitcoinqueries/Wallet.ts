@@ -41,7 +41,7 @@ export default class Wallet extends BitAuth {
             jsonrpc: '1.0',
             id: 'curltext',
             method: 'listtransactions',
-            params: [],
+            params: [100],
         };
 
         return axios.post(`${this.url}wallet/${wallet}`, body, headers);

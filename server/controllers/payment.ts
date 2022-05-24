@@ -4,9 +4,7 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
-import bitcoinq from '../bitcoinqueries';
-import { addressType } from '../interfaces/Address';
-import {createInvoice} from '../helpers/paymentHelper';
+import {createInvoice, createAddress} from '../helpers/paymentHelper';
 import 'dotenv/config';
 
 // Controller to generate lightning invoice and Bitcoin address
@@ -20,14 +18,15 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
 
         const orderId: string = req.params.orderId;
         const totalAmount: number = req.body.orderTotal;
+        const priceInSats: number = req.body.sats;
 
         if (totalAmount < 0) throw new Error("amount out of range");
 
         // Generate Bitcoin address
-        const bitcoinAddress = (await bitcoinq.addresses.getNewAddress('paymentaddress', addressType.bech32, 'torawallet')).data.result;
+        const bitcoinAddress = await createAddress();
 
         // Generate Lightning Invoice
-        const lnInvoice: string = (await createInvoice(totalAmount, process.env.DEFAULT_EXPIRY)).paymentRequest;
+        const lnInvoice: string = await createInvoice(priceInSats, process.env.DEFAULT_EXPIRY);
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 

@@ -8,6 +8,7 @@ import passport from 'passport';
 import session from 'express-session';
 import initializePassport from './helpers/passport';
 import { walletCheck } from './services/wallet';
+import { cron } from './services/cron';
 import 'dotenv/config';
 
 const app: Application = express();
@@ -15,7 +16,7 @@ const server = http.createServer(app);
 
 // Create Tora wallet
 walletCheck();
-
+cron();
 
 const io = require('socket.io')(server);
 let emitSocketEvent: any;
