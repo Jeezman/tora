@@ -1,4 +1,3 @@
-import { AddInvoiceResponse } from '@radar/lnrpc';
 import lndClient from '../config/lnd';
 import bitcoin from '../bitcoinqueries';
 import { addressType } from '../interfaces/Address';
@@ -12,6 +11,7 @@ export const createInvoice = async (amount: number = 0, expiry: string | undefin
     });
 
     return invoice.paymentRequest;
+
 };
 
 export const createAddress = async (): Promise<string> => {
