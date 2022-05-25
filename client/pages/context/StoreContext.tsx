@@ -47,7 +47,7 @@ export const StoreContextProvider = ({ children }: Props) => {
       const res = await fetchStore();
       let token = getData('token');
       if (!!token) {
-        if (res?.data.length > 0) setStoreName(res?.data[0]?.name);
+        if (res?.data?.length > 0) setStoreName(res?.data[0]?.name);
       }
     };
 

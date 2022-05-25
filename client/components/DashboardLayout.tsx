@@ -54,7 +54,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
           </div>
           <div className={styles.ticker}>
             BTC Price
-            <h3 className='font-bold'>${commaify(Number(data.toFixed(4)))}</h3>
+            <h3 className='font-bold'>${commaify(Number(data?.toFixed(4)))}</h3>
           </div>
         </aside>
 
