@@ -8,6 +8,7 @@ import { Button } from '../../components/shared/Button';
 import { Dialog, Transition } from '@headlessui/react';
 import { DashboardContext } from '../context/DashboardContext';
 import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
+import { BalanceCard } from '../../components/BalanceCard';
 function Dashboard() {
   const router = useRouter();
   const { handleCreateStore } = useContext(DashboardContext);
@@ -26,21 +27,15 @@ function Dashboard() {
   return (
     <section>
       <div className={styles.top}>
-        <h1>Dashboard</h1>
+        <h1 className='text-2xl font-semibold'>Dashboard</h1>
         <Button onClick={() => setAddStoreModal(true)}>Create store</Button>
       </div>
-      <div>
-        <h1>Wallets</h1>
-        <p>Total balance $0.00 USD</p>
-      </div>
-      <div>
-        <div>
-          <p>0 BTC</p>
-          <p>$0.00 USD</p>
-        </div>
+      <div className='flex w-1/2 justify-between my-10'>
+        <BalanceCard title='Bitcoin Wallet' amount={200} type={1} />
+        <BalanceCard title='USD Wallet' amount={200} type={2} />
       </div>
       <aside>
-        <h2>Recent Transactions</h2>
+        <h2>Recent Activity</h2>
       </aside>
       <MyModal
         show={addStoreModal}
