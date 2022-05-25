@@ -6,6 +6,7 @@ import styles from '../../styles/Store.module.css';
 import { CartContext } from '../context/CartContext';
 import { StoreContext } from '../context/StoreContext';
 import { useRouter } from 'next/router';
+import CartList from '../../components/CartList';
 
 function Store() {
   const {
@@ -85,6 +86,7 @@ function Store() {
             sidebarActive ? styles.active : ''
           }`}
         >
+          <CartList items={cartItems} />
           <Button onClick={handleCheckout}>Checkout</Button>
         </div>
         <div
