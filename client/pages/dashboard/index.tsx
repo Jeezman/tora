@@ -2,21 +2,19 @@ import React, { useContext, useEffect, useState, Fragment } from 'react';
 import Head from 'next/head';
 import { DashboardLayout, siteTitle } from '../../components/DashboardLayout';
 import styles from '../../styles/Dashboard.module.css';
-import { AuthContext } from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { Button } from '../../components/shared/Button';
 import { Dialog, Transition } from '@headlessui/react';
 import { DashboardContext } from '../context/DashboardContext';
-import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
 import { BalanceCard } from '../../components/BalanceCard';
 import { TransactionTable } from '../../components/shared/TransactionsTable';
+import { StoreContext } from '../context/StoreContext';
 function Dashboard() {
   const router = useRouter();
   const { handleCreateStore } = useContext(DashboardContext);
+  const { storeName } = useContext(StoreContext);
   const [addStoreModal, setAddStoreModal] = useState(false);
 
-  const data = useGetBTCPrice({amount: 50});
-  console.log('Dashboard Data ', data);
   const handleCloseAddStoreModal = () => setAddStoreModal(false);
   const onCreateStore = (name: string) => {
     handleCreateStore({ name: name });
@@ -29,7 +27,7 @@ function Dashboard() {
     <section>
       <div className={styles.top}>
         <h1 className='text-2xl font-semibold'>Dashboard</h1>
-        <Button onClick={() => setAddStoreModal(true)}>Create store</Button>
+        <Button disabled={!!storeName} onClick={() => setAddStoreModal(true)}>{!!storeName ? `${storeName.toUpperCase()}` : `Create store`}</Button>
       </div>
       <div className='flex w-1/2 justify-between my-10'>
         <BalanceCard title='Bitcoin Wallet' amount={200} type={1} />
