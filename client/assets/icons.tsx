@@ -64,3 +64,32 @@ export const SpinnerIcon = ({ size = 24, color = '#fff', className = ''}) => {
     </svg>
   );
 };
+
+export const MinusButtton = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="none"
+    height={24}
+    width={24}
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <circle cx={12} cy={12} fill="#F2F2F2" r={11.5} stroke="#E0E0E0" />
+    <path d="M14.158 12.332H10.7v-1.057h3.458v1.057Z" fill="#333" />
+  </svg>
+)
+
+export const PlusButton = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    fill="none"
+    height={24}
+    width={24}
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <circle cx={12} cy={12} fill="#F2F2F2" r={11.5} stroke="#E0E0E0" />
+    <path
+      d="M15.406 11.772h-2.849v3.01h-1.022v-3.01H8.7v-.945h2.835V7.838h1.022v2.989h2.849v.945Z"
+      fill="#333"
+    />
+  </svg>
+)
