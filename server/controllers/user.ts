@@ -145,8 +145,15 @@ export const userTransactions = async (req: Request, res: Response, next: NextFu
         }
 
         const reqUser = req as RequestUser;
+        const limit = req.query.limit;
 
-        const transactions: DB.TransactionLogs[] = await knex<DB.TransactionLogs>('Transactions').where({ userId: reqUser.user.userId });
+        let transactions: DB.TransactionLogs[];
+
+        if (limit) {
+            transactions = await knex<DB.TransactionLogs>('Transactions').where({ userId: reqUser.user.userId }).limit(Number(limit));
+        } else {
+            transactions = await knex<DB.TransactionLogs>('Transactions').where({ userId: reqUser.user.userId });
+        }
 
         return responseSuccess(res, 201, 'Successfully fetch user balance', transactions);
     } catch (err) {
