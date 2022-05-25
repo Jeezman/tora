@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import styles from './DashboardLayout.module.css';
 import Head from 'next/head';
 import Link from 'next/link';
 import { DashboardTopNav } from './DashboardNav';
+import { useGetBTCPrice } from './shared/useGetBTCPrice';
+import { commaify } from '../util/commaify';
 
 const name = 'Taro';
 export const siteTitle = 'Bitcoin/Lightning store front';
@@ -10,6 +12,13 @@ export const siteTitle = 'Bitcoin/Lightning store front';
 export type DashboardLayoutProps = { children: any };
 
 export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
+  const data = useGetBTCPrice({})
+  const [price, setPrice] = useState(data)
+  console.log('dashboard layout ', data)
+
+  useEffect(() => {
+    setPrice(data)
+  }, [data])
   return (
     <main>
       <Head>
@@ -42,6 +51,10 @@ export const DashboardLayout: FC<DashboardLayoutProps> = ({ children }) => {
             <Link href="/dashboard/orders">
               <a className={styles.sidebar_menu_item}>Orders</a>
             </Link>
+          </div>
+          <div className={styles.ticker}>
+            BTC Price
+            <h3 className='font-bold'>${commaify(Number(data.toFixed(4)))}</h3>
           </div>
         </aside>
 
