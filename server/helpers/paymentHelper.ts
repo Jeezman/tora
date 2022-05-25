@@ -38,6 +38,11 @@ export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
     ).where({ invoice: invoice.paymentRequest });
 
     if (orderPayment.length === 1) {
+        // Subscribe to invoice
+        const subscribe = await rpc.subscribeInvoices({
+            addIndex: invoice.addIndex,
+        });
+
         const orderId = orderPayment[0].orderId;
 
         // Get the order
@@ -52,28 +57,28 @@ export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
         });
         const userId: number = store[0].userId;
 
-        // Subscribe to invoice
-        const subscribe = await rpc.subscribeInvoices({
-            addIndex: invoice.addIndex,
-        });
-
         // Get order
         const transaction: DB.OrderPayment[] = await knex<DB.OrderPayment>(
             'OrderPayments'
         ).where({ invoice: invoice.paymentRequest });
 
         subscribe.on('data', async (response) => {
+            const paymentValue = Number(response.value);
+
+            // Convert satoshis to BTC
+            const btcValue = paymentValue / 100000000;
+
             if (response.settled) {
                 // Check if transaction has been settled
                 if (transaction[0].status !== 'settled') {
                     // Add Lightning payment to user's transaction logs
-                    insertTransaction(transaction[0].totalAmount, invoice.paymentRequest, 1, 'receive', userId);
+                    insertTransaction(btcValue, invoice.paymentRequest, 1, 'receive', userId);
 
-                    updateBalanceAndTransaction(userId, orderPayment[0].totalAmount, invoice.paymentRequest, 'settled');
+                    updateBalanceAndTransaction(userId, btcValue, invoice.paymentRequest, 'settled');
                 }
             } else {
                 // Add Lightning payment to user's transaction logs
-                insertTransaction(transaction[0].totalAmount, invoice.paymentRequest, 0, 'receive', userId);
+                insertTransaction(btcValue, invoice.paymentRequest, 0, 'receive', userId);
 
                 updateBalanceAndTransaction(userId, orderPayment[0].totalAmount, invoice.paymentRequest, 'failed');
             }
@@ -82,14 +87,14 @@ export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
 };
 
 const insertTransaction = async (
-    amount: number,
+    btcamount: number,
     lninvoice: string,
     status: number,
     type: string,
     userId: number
 ) => {
     await knex<DB.TransactionLogs>('Transactions').insert({
-        amount,
+        btcamount,
         lninvoice,
         status,
         type,
@@ -104,15 +109,15 @@ const updateBalanceAndTransaction = async (
     status: string,
 ) => {
     try {
+        // Update the OrderPayments
+        await knex<DB.OrderPayment>('OrderPayments').where({ invoice }).update({ status });
+
         // Update the User's Balance with the transaction amount if the invoice is settled
         if (status === 'settled') {
             await knex<DB.UserWallet>('UserWallet')
-                .update({ balance: knex.raw(`balance + ${amount}`) })
+                .update({ btcbalance: knex.raw(`btcbalance + ${amount}`) })
                 .where({ userId: userId });
         }
-
-        // Update the OrderPayments
-        await knex<DB.OrderPayment>('OrderPayments').where({ invoice }).update({ status });
     } catch (err) {
         // Log Error
         console.log('Update Balance Error ===', (err as Error).message);
