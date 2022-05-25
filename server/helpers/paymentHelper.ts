@@ -32,14 +32,10 @@ export const createAddress = async (): Promise<string> => {
 export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
     const rpc = await lndClient;
 
-    console.log('invoice ------- ', invoice.paymentRequest)
-
     // Get the lightning invoice;
     const orderPayment: DB.OrderPayment[] = await knex<DB.OrderPayment>(
         'OrderPayments'
     ).where({ invoice: invoice.paymentRequest });
-
-    console.log('if orderPayments ', orderPayment);
 
     if (orderPayment.length === 1) {
         const orderId = orderPayment[0].orderId;
@@ -48,11 +44,7 @@ export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
             addIndex: invoice.addIndex,
         });
 
-        console.log('if inside orderPayments ', subscribe)
-
-
         subscribe.on('data', async (response) => {
-            console.log('subscription data ', response);
             if (response.settled) {
                 // get the order
                 const order: DB.Order[] = await knex<DB.Order>('Order').where({

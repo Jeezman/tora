@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import { addToCart, checkout, fetchCart, makePayment } from '../../api/cart';
 import {
@@ -14,14 +14,14 @@ interface Props {
 }
 
 export interface CartItems {
-    cartId:        string;
-    productId:     number;
-    buyerPubKey:   null;
-    buyerUsername: string;
-    amount:        number;
-    itemCount:     number;
-    total:         number;
-    storeId:       number;
+  cartId: string;
+  productId: number;
+  buyerPubKey: null;
+  buyerUsername: string;
+  amount: number;
+  itemCount: number;
+  total: number;
+  storeId: number;
 }
 
 
@@ -41,10 +41,10 @@ interface ICartContext {
 
 const defaultState = {
   isLoading: false,
-  handleAddToCart: (data: CartRequestModel) => {},
-  handleFetchCart: () => {},
-  handlePayment: (data: PaymentRequestModel) => {},
-  handleCartCheckout: async (data: CheckoutRequestModel) => {},
+  handleAddToCart: (data: CartRequestModel) => { },
+  handleFetchCart: () => { },
+  handlePayment: (data: PaymentRequestModel) => { },
+  handleCartCheckout: async (data: CheckoutRequestModel) => { },
   cartItems: [],
   order: [],
   orderDetails: {
@@ -85,8 +85,8 @@ export const CartContextProvider = ({ children }: Props) => {
     setCartItems(res.data);
   };
 
-  const handleDeletefromCart = () => {};
-  const handleClearCart = () => {};
+  const handleDeletefromCart = () => { };
+  const handleClearCart = () => { };
 
   const handleCartCheckout = async (data: CheckoutRequestModel) => {
     setIsFetchingInvoice(true);
@@ -95,7 +95,7 @@ export const CartContextProvider = ({ children }: Props) => {
     await setOrderTotal(res.data.data.orderTotal);
   };
 
-  const handlePayment = async (data: PaymentRequestModel) => {
+  const handlePayment = useCallback(async (data: PaymentRequestModel) => {
     let req = {
       orderId: data.orderId,
       orderTotal: data.orderTotal,
@@ -108,7 +108,7 @@ export const CartContextProvider = ({ children }: Props) => {
     }
     setIsFetchingInvoice(false);
     return res;
-  };
+  }, []);
 
   const contextValue = {
     cartItems,
