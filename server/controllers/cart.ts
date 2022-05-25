@@ -108,10 +108,19 @@ export const listCart = async (req: Request, res: Response, next: NextFunction):
         if (buyerPubKey !== 'undefined') {
             carts = await knex<DB.Cart>('Carts').where({ buyerPubKey });
         } else {
-            carts = await knex<DB.Cart>('Carts').where({ buyerUsername })
+            carts = await knex<DB.Cart>('Carts').where({ buyerUsername });
         }
 
-        return responseSuccess(res, 200, 'listed user cart successfully', carts);
+        // Add cart products to cart
+        for(let cart of carts) {
+            const cartProducts: DB.Product | undefined = await knex<DB.Product>('Products').where({ productId: cart.productId }).first();
+
+            if (cartProducts) {
+                cart.product = cartProducts;
+            }
+        }
+
+        return responseSuccess(res, 200, 'Listed user cart successfully', carts);
 
     } catch (err) {
         next(err);

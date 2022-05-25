@@ -51,6 +51,7 @@ export namespace DB {
         itemCount: number;
         total: number;
         storeId?: number;
+        product?: Product;
     }
 
     export interface CartId {
