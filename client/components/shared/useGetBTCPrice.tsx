@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 interface Props {
-    amount: number
+    amount?: number
 }
 
 interface Price {
@@ -37,7 +37,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export const useGetBTCPrice = ({ amount }: Props) => {
     // const [fetchedData, setFetchedData] = useState(defaultState.coins)
-    const { data, error } = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, {refreshInterval: 30000} );
+    const { data, error } = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, { refreshInterval: 30000 });
+    
+    if (!amount) return data?.coins[0].price;
 
     console.log('data is ', data)
     console.log('price is ', data?.coins[0].price)

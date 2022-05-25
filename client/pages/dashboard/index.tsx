@@ -9,6 +9,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { DashboardContext } from '../context/DashboardContext';
 import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
 import { BalanceCard } from '../../components/BalanceCard';
+import { TransactionTable } from '../../components/shared/TransactionsTable';
 function Dashboard() {
   const router = useRouter();
   const { handleCreateStore } = useContext(DashboardContext);
@@ -35,7 +36,8 @@ function Dashboard() {
         <BalanceCard title='USD Wallet' amount={200} type={2} />
       </div>
       <aside>
-        <h2>Recent Activity</h2>
+        <h2 className='mb-8 text-2xl font-semibold'>Recent Activity</h2>
+        <TransactionTable />
       </aside>
       <MyModal
         show={addStoreModal}
