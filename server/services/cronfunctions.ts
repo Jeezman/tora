@@ -3,6 +3,7 @@ import { TransactionResult } from '../interfaces/Transaction';
 import 'dotenv/config';
 import knex from '../db/knex';
 import { DB } from '../interfaces/Db';
+import { emitSocketEvent } from '../config/socket';
 
 const noOfCon = Number(process.env.NO_OF_CONFIRMATIONS);
 
@@ -17,6 +18,9 @@ export const updateBalanceAndTransaction = async (userId: number, address: strin
 
         // Update the transaction status in transaction log
         await knex<DB.TransactionLogs>('Transactions').update({ status: 1 }).where({ txid: txid });
+
+        // Send payment success event
+        emitSocketEvent.emit('paymentsuccess', null);
     } catch (err) {
         // Log Error
         console.log('Update Balance Error ===', (err as Error).message);

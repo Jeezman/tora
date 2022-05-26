@@ -1,12 +1,24 @@
-import server from "../app";
 import { Server, Socket } from 'socket.io';
+import http from 'http';
 
-const io = new Server(server);
+let emitSocketEvent: Socket;
 
-io.on('connction', (client: Socket) => {
-    console.log('Conected ===', client);
-    // client.on()
-});
+const initializeSocket = (server: http.Server) => {
 
-export default io;
+    const io = new Server(server);
+    console.log('In initialize socket');
+    return io.on('connection', (client: Socket) => {
+        console.log('User Conected ===');
+
+        client.on('disconnect', () => {
+            console.log('User Disconnect');
+        });
+
+        emitSocketEvent = client;
+    });
+}
+
+export { emitSocketEvent };
+
+export default initializeSocket;
 
