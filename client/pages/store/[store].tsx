@@ -7,6 +7,7 @@ import { CartContext } from '../context/CartContext';
 import { StoreContext } from '../context/StoreContext';
 import { useRouter } from 'next/router';
 import CartList from '../../components/CartList';
+import { storeData } from '../../util/storage';
 
 function Store() {
   const {
@@ -24,6 +25,7 @@ function Store() {
   
    useEffect(() => {
      setStoreName(router.query.store)
+     storeData('store', String(router.query.store))
   }, []);
 
   useEffect(() => {
