@@ -36,7 +36,8 @@ const defaultState = {
 export const StoreContext = React.createContext<IStoreContext>(defaultState);
 
 export const StoreContextProvider = ({ children }: Props) => {
-  const [storeName, setStoreName] = useState(defaultState.storeName);
+  let _storeName = getData('store')
+  const [storeName, setStoreName] = useState(defaultState.storeName || _storeName);
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
   const [products, setProducts] = useState(defaultState.products);
 
