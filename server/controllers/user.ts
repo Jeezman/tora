@@ -7,7 +7,7 @@ import { hashPassword, verifyPassword } from '../helpers/password';
 import { signUser } from '../helpers/jwt';
 import { RequestUser } from '../interfaces';
 import lnurlServer from '../helpers/lnurl';
-import { emitSocketEvent } from '../app';
+import { emitSocketEvent } from '../config/socket';
 
 // Controller for registering user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {

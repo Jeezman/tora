@@ -4,6 +4,7 @@ import bitcoin from '../bitcoinqueries';
 import { addressType } from '../interfaces/Address';
 import { DB } from '../interfaces/Db';
 import knex from '../db/knex';
+import { emitSocketEvent } from '../config/socket';
 
 export const createInvoice = async (
     amount: number = 0,
@@ -117,6 +118,12 @@ const updateBalanceAndTransaction = async (
             await knex<DB.UserWallet>('UserWallet')
                 .update({ btcbalance: knex.raw(`btcbalance + ${amount}`) })
                 .where({ userId: userId });
+
+            // Send payment success event
+            emitSocketEvent.emit('paymentsuccess', null);
+        } else {
+            // Send payment failure event
+            emitSocketEvent.emit('paymentfailure', null);
         }
     } catch (err) {
         // Log Error
