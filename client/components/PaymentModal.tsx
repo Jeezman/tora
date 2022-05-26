@@ -90,8 +90,7 @@ export const PaymentModal = ({ show, close }: Props) => {
                   <>
                     <QRCodeSVG
                       value={
-                        addresses.lnInvoice ||
-                        '3MCK95rgzRiJxZ19swhvS44khTfYiHQdjF'
+                        addresses.lnInvoice
                       }
                       size={300}
                     />
@@ -99,16 +98,14 @@ export const PaymentModal = ({ show, close }: Props) => {
                       Bitcoin Address
                     </h2>
                     <span className={styles.address}>
-                      {addresses.bitcoinAddress ||
-                        '3MCK95rgzRiJxZ19swhvS44khTfYiHQdjF'}
+                      {addresses.bitcoinAddress.toUpperCase()}
                     </span>
                   </>
                 ) : (
                   <>
                     <QRCodeSVG
                       value={
-                        addresses.lnInvoice ||
-                        'LNBC868230N1P3G73V4PP56PRHQ5FGN75XD7PFZADVLPHX6MV7LPJRDS4UYYKREQ7SNDQUE5SQDPZF9H8VMMFVDJJQGE3YQKJQNNFVD5X7MRPWVCQZPGXQZJHSP5UHAXZHHHYFU7E9GK6C57VY3W0C4YNGH6LL0JG8QULHN3GX5YWN0Q9QYYSSQHMS2GSGH7LTE7QZ4R6GFMJH00YRSRZHTGPQFLX7HWMFKPH9WEVM57LXMRRA4P022FSGHW9C4X2RV49MM8MTYJZXZLVH27ZHJ66C6K3GQGJJFDY'
+                        addresses.lnInvoice
                       }
                       size={300}
                     />
@@ -116,8 +113,7 @@ export const PaymentModal = ({ show, close }: Props) => {
                       Lightning Invoice
                     </h2>
                     <span className={styles.address}>
-                      {addresses.lnInvoice ||
-                        'LNBC868230N1P3G73V4PP56PRHQ5FGN75XD7PFZADVLPHX6MV7LPJRDS4UYYKREQ7SNDQUE5SQDPZF9H8VMMFVDJJQGE3YQKJQNNFVD5X7MRPWVCQZPGXQZJHSP5UHAXZHHHYFU7E9GK6C57VY3W0C4YNGH6LL0JG8QULHN3GX5YWN0Q9QYYSSQHMS2GSGH7LTE7QZ4R6GFMJH00YRSRZHTGPQFLX7HWMFKPH9WEVM57LXMRRA4P022FSGHW9C4X2RV49MM8MTYJZXZLVH27ZHJ66C6K3GQGJJFDY'}
+                      {addresses.lnInvoice.toUpperCase()}
                     </span>
                   </>
                 )}

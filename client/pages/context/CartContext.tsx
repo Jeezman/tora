@@ -99,6 +99,7 @@ export const CartContextProvider = ({ children }: Props) => {
     let req = {
       orderId: data.orderId,
       orderTotal: data.orderTotal,
+      bitcoins: data.bitcoins,
       sats: data.sats,
     };
     let res = await makePayment(req);

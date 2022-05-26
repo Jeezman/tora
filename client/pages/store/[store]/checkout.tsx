@@ -51,7 +51,7 @@ const Checkout = () => {
       let requestData = {
         orderId: orderDetails.orderId,
         orderTotal,
-        bitcoins: data.usdToBTC.toFixed(4),
+        bitcoins: data.usdToBTC,
         sats: data.usdToSats
       }
       handlePayment(requestData)

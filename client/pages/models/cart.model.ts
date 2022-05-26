@@ -32,7 +32,8 @@ export interface CheckoutRequestResponse {
 export interface PaymentRequestModel {
     orderId: string;
     orderTotal: number;
-    sats: number
+    sats: number;
+    bitcoins: number;
 } 
 
 export interface PaymentRequestResponse {
