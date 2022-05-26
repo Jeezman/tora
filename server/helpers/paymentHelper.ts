@@ -120,10 +120,10 @@ const updateBalanceAndTransaction = async (
                 .where({ userId: userId });
 
             // Send payment success event
-            emitSocketEvent.emit('paymentsuccess', null);
+            emitSocketEvent.emit('paymentsuccess', amount);
         } else {
             // Send payment failure event
-            emitSocketEvent.emit('paymentfailure', null);
+            emitSocketEvent.emit('paymentfailure', amount);
         }
     } catch (err) {
         // Log Error

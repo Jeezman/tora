@@ -20,7 +20,7 @@ export const updateBalanceAndTransaction = async (userId: number, address: strin
         await knex<DB.TransactionLogs>('Transactions').update({ status: 1 }).where({ txid: txid });
 
         // Send payment success event
-        emitSocketEvent.emit('paymentsuccess', null);
+        emitSocketEvent.emit('paymentsuccess', amount);
     } catch (err) {
         // Log Error
         console.log('Update Balance Error ===', (err as Error).message);
