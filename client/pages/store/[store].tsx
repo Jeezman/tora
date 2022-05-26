@@ -26,15 +26,15 @@ function Store() {
    useEffect(() => {
      setStoreName(router.query.store)
      storeData('store', String(router.query.store))
-  }, []);
+  }, [router.query.store, setStoreName]);
 
   useEffect(() => {
     if (!!storeName) handleGetAllProducts();
-  }, [storeName]);
+  }, [handleGetAllProducts, storeName]);
 
   useEffect(() => {
     handleFetchCart();
-  }, []);
+  }, [handleFetchCart]);
 
   const onAddToCart = (product: any) => {
     console.log('handleProductClick ', product);
@@ -89,7 +89,7 @@ function Store() {
           }`}
         >
           <CartList items={cartItems} />
-          <Button onClick={handleCheckout}>Checkout</Button>
+          <Button disabled={false} onClick={handleCheckout}>Checkout</Button>
         </div>
         <div
           onClick={() => setSidebarActive(!sidebarActive)}

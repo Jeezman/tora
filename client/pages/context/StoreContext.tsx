@@ -43,16 +43,8 @@ export const StoreContextProvider = ({ children }: Props) => {
 
   const router = useRouter()
 
-  const getEventsSocket = useCallback(() => {
-    socket.on("paymentsuccess", (arg: any) => {
-      alert('Payment successful')
-      router.push(`/store/${storeName}`)
-    })
-  }, []);
-
   useEffect(() => {
-    getEventsSocket();
-  }, [getEventsSocket]);
+  }, []);
 
   useEffect(() => {
     const fetchStoreData = async () => {
@@ -64,7 +56,7 @@ export const StoreContextProvider = ({ children }: Props) => {
     };
 
     if (router.pathname !== '/' && router.pathname !== '/store/[store]') fetchStoreData();
-  }, []);
+  }, [router.pathname]);
 
   const handleCreateStore = async (data: StoreRequestModel) => {
     setIsLoading(true);

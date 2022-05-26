@@ -67,12 +67,6 @@ export const AuthContextProvider = ({ children }: Props) => {
         router.push('/dashboard/');
       }
     });
-    let store = getData('store')
-    console.log('store is ', store)
-    socket.on("paymentsuccess", (arg: any) => {
-      alert('Payment successful')
-      router.push(`/store/${store}`)
-    })
   }, [router]);
 
   useEffect(() => {

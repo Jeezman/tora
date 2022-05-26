@@ -103,7 +103,6 @@ export const CartContextProvider = ({ children }: Props) => {
       sats: data.sats,
     };
     let res = await makePayment(req);
-    console.log('handlePayment res ', res);
     if (res?.data?.data) {
       setAddresses(res.data.data);
     }
