@@ -112,3 +112,12 @@ export const fetchStore = async () => {
     return error.response.data;
   }
 }
+
+export const getBalance = async () => {
+  try {
+    const res = await axios.get('user/balance');
+    return res.data;
+  } catch (error) {
+    console.log('calling error ', error);
+  }
+}

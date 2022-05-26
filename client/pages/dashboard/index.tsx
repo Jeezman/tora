@@ -11,9 +11,13 @@ import { TransactionTable } from '../../components/shared/TransactionsTable';
 import { StoreContext } from '../context/StoreContext';
 function Dashboard() {
   const router = useRouter();
-  const { handleCreateStore } = useContext(DashboardContext);
+  const { handleCreateStore,handleGetUserBalance,balance } = useContext(DashboardContext);
   const { storeName } = useContext(StoreContext);
   const [addStoreModal, setAddStoreModal] = useState(false);
+
+  useEffect(() => {
+    handleGetUserBalance()
+  }, [])
 
   const handleCloseAddStoreModal = () => setAddStoreModal(false);
   const onCreateStore = (name: string) => {
@@ -28,7 +32,7 @@ function Dashboard() {
         <Button disabled={!!storeName} onClick={() => setAddStoreModal(true)}>{!!storeName ? `${storeName.toUpperCase()}` : `Create store`}</Button>
       </div>
       <div className='flex w-1/2 justify-between my-10'>
-        <BalanceCard title='Bitcoin Wallet' amount={200} type={1} />
+        <BalanceCard title='Bitcoin Wallet' amount={balance} type={1} />
         <BalanceCard title='USD Wallet' amount={200} type={2} />
       </div>
       <aside>

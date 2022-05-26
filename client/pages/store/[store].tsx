@@ -30,11 +30,11 @@ function Store() {
 
   useEffect(() => {
     if (!!storeName) handleGetAllProducts();
-  }, [handleGetAllProducts, storeName]);
+  }, [ storeName]);
 
   useEffect(() => {
     handleFetchCart();
-  }, [handleFetchCart]);
+  }, []);
 
   const onAddToCart = (product: any) => {
     console.log('handleProductClick ', product);
