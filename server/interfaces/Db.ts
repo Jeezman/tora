@@ -113,11 +113,12 @@ export namespace DB {
         id?: number;
         userId: number;
         balance: number;
+        btcbalance: number;
     }
     
     export interface TransactionLogs {
         id?: number;
-        amount: number;
+        btcamount: number;
         txid?: string;
         lninvoice?: string;
         status: number;
