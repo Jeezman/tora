@@ -56,7 +56,7 @@ const Checkout = () => {
       }
       handlePayment(requestData)
     }
-  }, [data.usdToBTC, data.usdToSats, handlePayment, orderDetails.orderId, orderTotal])
+  }, [data?.usdToBTC, data?.usdToSats, handlePayment, orderDetails.orderId, orderTotal])
 
   return (
     <section className={styles.container}>

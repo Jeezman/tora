@@ -19,8 +19,6 @@ function Dashboard() {
   const onCreateStore = (name: string) => {
     handleCreateStore({ name: name });
     setAddStoreModal(false);
-
-    console.log('store name is ', name)
   };
 
   return (
