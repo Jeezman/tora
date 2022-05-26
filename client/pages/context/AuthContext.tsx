@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import Router, { useRouter } from 'next/router';
 import { login, loginWithLN, register } from '../../api';
 import { getData, storeData } from '../../util/storage';
@@ -10,7 +10,7 @@ import { useGetBTCPrice } from '../../components/shared/useGetBTCPrice';
 
 export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || '';
 
-const socket = io(SOCKET_URL, {
+export const socket = io(SOCKET_URL, {
   transports: ['websocket'],
   auth: {
     'client-id': v4().substring(0, 10),
@@ -55,7 +55,8 @@ export const AuthContextProvider = ({ children }: Props) => {
 
   const router = useRouter();
 
-  const getEventsSocket = () => {
+
+  const getEventsSocket = useCallback(() => {
     socket.on('auth', (arg: any) => {
       console.log('socket connected ', arg);
 
@@ -72,11 +73,11 @@ export const AuthContextProvider = ({ children }: Props) => {
       alert('Payment successful')
       router.push(`/store/${store}`)
     })
-  };
+  }, [router]);
 
   useEffect(() => {
     getEventsSocket();
-  }, []);
+  }, [getEventsSocket]);
 
   const handleLogin = async (data: LoginRequestModel) => {
     setIsLoading(true);

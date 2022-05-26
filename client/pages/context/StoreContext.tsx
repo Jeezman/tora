@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import {
   createStore,
@@ -8,6 +8,7 @@ import {
 } from '../../api/store';
 import { getData, storeData } from '../../util/storage';
 import { StoreRequestModel, ProductRequestModel } from '../models/store.model';
+import { socket } from './AuthContext';
 
 interface Props {
   children: React.ReactNode;
@@ -36,12 +37,22 @@ const defaultState = {
 export const StoreContext = React.createContext<IStoreContext>(defaultState);
 
 export const StoreContextProvider = ({ children }: Props) => {
-  let _storeName = getData('store')
-  const [storeName, setStoreName] = useState(defaultState.storeName || _storeName);
+  const [storeName, setStoreName] = useState(defaultState.storeName);
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
   const [products, setProducts] = useState(defaultState.products);
 
   const router = useRouter()
+
+  const getEventsSocket = useCallback(() => {
+    socket.on("paymentsuccess", (arg: any) => {
+      alert('Payment successful')
+      router.push(`/store/${storeName}`)
+    })
+  }, []);
+
+  useEffect(() => {
+    getEventsSocket();
+  }, [getEventsSocket]);
 
   useEffect(() => {
     const fetchStoreData = async () => {
