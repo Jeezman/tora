@@ -1,0 +1,23 @@
+.top_nav {
+    display: flex;
+    width: 100%;
+    height: 70px;
+    margin-right: 144px;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(237,241,245,1);
+    padding: 2rem 5rem;
+}
+
+.avatar {
+    position: relative;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: rgb(20, 77, 97);
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
