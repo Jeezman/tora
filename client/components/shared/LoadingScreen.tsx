@@ -16,7 +16,7 @@ const LoadingScreen = () => {
       }
     };
     _getData();
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn]);
   return null;
   return (
     <div>

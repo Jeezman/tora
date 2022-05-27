@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import {
   createStore,
@@ -8,6 +8,7 @@ import {
 } from '../../api/store';
 import { getData, storeData } from '../../util/storage';
 import { StoreRequestModel, ProductRequestModel } from '../models/store.model';
+import { socket } from './AuthContext';
 
 interface Props {
   children: React.ReactNode;
@@ -43,16 +44,19 @@ export const StoreContextProvider = ({ children }: Props) => {
   const router = useRouter()
 
   useEffect(() => {
+  }, []);
+
+  useEffect(() => {
     const fetchStoreData = async () => {
       const res = await fetchStore();
-      let token = await getData('token');
-      if (token) {
-        setStoreName(res?.data[0]?.name);
+      let token = getData('token');
+      if (!!token) {
+        if (res?.data?.length > 0) setStoreName(res?.data[0]?.name);
       }
     };
 
-    if (router.pathname !== '/') fetchStoreData();
-  }, []);
+    if (router.pathname !== '/' && router.pathname !== '/store/[store]') fetchStoreData();
+  }, [router.pathname]);
 
   const handleCreateStore = async (data: StoreRequestModel) => {
     setIsLoading(true);

@@ -81,7 +81,7 @@ export const makePayment = async (params: PaymentRequestModel) => {
   try {
     const res: PaymentRequestModel = await axios.post(
       `payment/order/${params.orderId}`,
-      { orderTotal: params.orderTotal }
+      { orderTotal: params.orderTotal, sats: params.sats, bitcoins: params.bitcoins }
     );
     return res;
   } catch (error: any) {

@@ -6,6 +6,8 @@ import styles from '../../styles/Store.module.css';
 import { CartContext } from '../context/CartContext';
 import { StoreContext } from '../context/StoreContext';
 import { useRouter } from 'next/router';
+import CartList from '../../components/CartList';
+import { storeData } from '../../util/storage';
 
 function Store() {
   const {
@@ -23,11 +25,12 @@ function Store() {
   
    useEffect(() => {
      setStoreName(router.query.store)
-  }, []);
+     storeData('store', String(router.query.store))
+  }, [router.query.store, setStoreName]);
 
   useEffect(() => {
     if (!!storeName) handleGetAllProducts();
-  }, [storeName]);
+  }, [ storeName]);
 
   useEffect(() => {
     handleFetchCart();
@@ -85,7 +88,8 @@ function Store() {
             sidebarActive ? styles.active : ''
           }`}
         >
-          <Button onClick={handleCheckout}>Checkout</Button>
+          <CartList items={cartItems} />
+          <Button disabled={false} onClick={handleCheckout}>Checkout</Button>
         </div>
         <div
           onClick={() => setSidebarActive(!sidebarActive)}

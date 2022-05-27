@@ -5,6 +5,7 @@ import { CartContext } from '../../context/CartContext';
 import { CheckoutRequestModel } from '../../models/cart.model';
 import { useRouter } from 'next/router';
 import { PaymentModal } from '../../../components/PaymentModal';
+import { useGetBTCPrice } from '../../../components/shared/useGetBTCPrice';
 
 const Checkout = () => {
   const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment, orderDetails, orderTotal } =
@@ -14,6 +15,12 @@ const Checkout = () => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+
+  console.log('order total ', orderTotal);
+
+  const data = useGetBTCPrice({ amount: cartItems[0]?.total || 0 })
+  
+  console.log('sats data ', data)
 
   const router = useRouter();
   
@@ -43,11 +50,13 @@ const Checkout = () => {
     if (orderDetails.orderId) {
       let requestData = {
         orderId: orderDetails.orderId,
-        orderTotal
+        orderTotal,
+        bitcoins: data.usdToBTC,
+        sats: data.usdToSats
       }
       handlePayment(requestData)
     }
-  }, [orderDetails.orderId, orderTotal])
+  }, [data?.usdToBTC, data?.usdToSats, handlePayment, orderDetails.orderId, orderTotal])
 
   return (
     <section className={styles.container}>
@@ -89,7 +98,7 @@ const Checkout = () => {
             className=" form-control block w-full  px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           />
         </div>
-        <Button onClick={handleCheckout}>Pay</Button>
+        <Button disabled={false} onClick={handleCheckout}>Pay</Button>
       </div>
       <PaymentModal show={showPaymentModal} close={closeModal} />
     </section>

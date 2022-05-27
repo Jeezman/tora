@@ -7,7 +7,7 @@ import { hashPassword, verifyPassword } from '../helpers/password';
 import { signUser } from '../helpers/jwt';
 import { RequestUser } from '../interfaces';
 import lnurlServer from '../helpers/lnurl';
-import { emitSocketEvent } from '../app';
+import { emitSocketEvent } from '../config/socket';
 
 // Controller for registering user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -30,7 +30,10 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         }
 
         const password: string = hashPassword(pass);
-        await knex<DB.User>('Users').insert({ email, password });
+        const userCreated = await knex<DB.User>('Users').insert({ email, password }).returning('userId');
+
+        // Create user balance default to 0
+        await knex<DB.UserWallet>('UserWallet').insert({ userId: userCreated[0].userId, balance: 0 });
 
         responseSuccess(res, 200, 'Successfully created user', {});
 
@@ -111,6 +114,53 @@ export const updateUserDetails = async (req: Request, res: Response, next: NextF
     }
 };
 
+// Controller for getting a user's balance
+export const userBalance = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const reqUser = req as RequestUser;
+
+        const userBalance: DB.UserWallet | undefined = await knex<DB.UserWallet>('UserWallet').where({ userId: reqUser.user.userId }).first();
+
+        return responseSuccess(res, 201, 'Successfully fetch user balance', userBalance);
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Controller for getting a user's transactions
+export const userTransactions = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const reqUser = req as RequestUser;
+        const limit = req.query.limit;
+
+        let transactions: DB.TransactionLogs[];
+
+        if (limit) {
+            transactions = await knex<DB.TransactionLogs>('Transactions').where({ userId: reqUser.user.userId }).limit(Number(limit));
+        } else {
+            transactions = await knex<DB.TransactionLogs>('Transactions').where({ userId: reqUser.user.userId });
+        }
+
+        return responseSuccess(res, 201, 'Successfully fetch user balance', transactions);
+    } catch (err) {
+        next(err);
+    }
+};
+
 export const lnurlLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const result = await lnurlServer.generateNewUrl("login");
@@ -130,8 +180,11 @@ export const pseudoLogin = async (req: Request, res: Response, next: NextFunctio
             // Check if user exists in the database;
             const users: DB.User[] = await knex<DB.User>('Users').where({ publicKey: key });
 
-            if(users.length === 0) {
-                await knex<DB.User>('Users').insert({ publicKey: key });
+            if (users.length === 0) {
+                const userCreated = await knex<DB.User>('Users').insert({ publicKey: key }).returning('userId');
+
+                // Create user balance default to 0
+                await knex<DB.UserWallet>('UserWallet').insert({ userId: userCreated[0].userId, balance: 0 });
             }
 
             // Get user again for token
@@ -140,13 +193,13 @@ export const pseudoLogin = async (req: Request, res: Response, next: NextFunctio
 
             // Delete user password and pk
             delete user.password;
-          
+
             const token = signUser(user);
 
             emitSocketEvent.emit('auth', { key, token });
             res.json({ key });
         } else {
-            return responseError(res, 404, 'Unsuccesful LNURL AUTH login'); 
+            return responseError(res, 404, 'Unsuccesful LNURL AUTH login');
         }
     } catch (err) {
         next(err);

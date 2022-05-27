@@ -4,8 +4,9 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
-import {createInvoice, createAddress} from '../helpers/paymentHelper';
+import {createInvoice, createAddress, subscribeToInvoice} from '../helpers/paymentHelper';
 import 'dotenv/config';
+import { AddInvoiceResponse } from '@radar/lnrpc';
 
 // Controller to generate lightning invoice and Bitcoin address
 export const generateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -18,7 +19,8 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
 
         const orderId: string = req.params.orderId;
         const totalAmount: number = req.body.orderTotal;
-        const priceInSats: number = req.body.sats;
+        const amountInBtc: number = req.body.bitcoins;
+        const amountInSats: number = req.body.sats;
 
         if (totalAmount < 0) throw new Error("amount out of range");
 
@@ -26,7 +28,7 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
         const bitcoinAddress = await createAddress();
 
         // Generate Lightning Invoice
-        const lnInvoice: string = await createInvoice(priceInSats, process.env.DEFAULT_EXPIRY);
+        const lnInvoice: AddInvoiceResponse = await createInvoice(Math.round(amountInSats), process.env.DEFAULT_EXPIRY);
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
 
@@ -37,13 +39,16 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
             return responseError(res, 404, 'Not a valid order');
         }
 
-        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice, totalAmount });
-        await knex<DB.OrderInvoiceLog>('OrderInvoiceLogs').insert({ paymentId, address: bitcoinAddress, invoice: lnInvoice });
+        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest, totalAmount, amountInBtc, amountInSats });
+
+        await knex<DB.OrderInvoiceLog>('OrderInvoiceLogs').insert({ paymentId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest });
 
         const data = {
             bitcoinAddress,
-            lnInvoice
+            lnInvoice: lnInvoice.paymentRequest
         };
+
+        subscribeToInvoice(lnInvoice);
 
         return responseSuccess(res, 200, 'Successfully created payment address and invoice', data);
 

@@ -51,6 +51,7 @@ export namespace DB {
         itemCount: number;
         total: number;
         storeId?: number;
+        product?: Product;
     }
 
     export interface CartId {
@@ -93,9 +94,12 @@ export namespace DB {
         paymentId: string;
         orderId: string;
         totalAmount: number;
+        amountInBtc?: number;
+        amountInSats?: number;
         invoice: string;
         address: string;
         date_created?: string;
+        status: string;
     }
 
     export interface OrderInvoiceLog {
@@ -105,19 +109,20 @@ export namespace DB {
         date_created?: string;
     }
 
-    export interface UserBalance {
+    export interface UserWallet {
         id?: number;
         userId: number;
-        amount: number;
+        balance: number;
+        btcbalance: number;
     }
     
     export interface TransactionLogs {
         id?: number;
-        amount: number;
+        btcamount: number;
         txid?: string;
         lninvoice?: string;
         status: number;
         type: string;
-        userid?: number;
+        userId?: number;
     }
 }
