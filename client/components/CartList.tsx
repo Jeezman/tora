@@ -9,7 +9,7 @@ const CartList = ({ items }: any) => {
   return (
     <section className={styles.container}>
       {items.map((item:any) => (
-        <div key={item.cartId} className={styles.cart_item}>
+        <div key={item.productId} className={styles.cart_item}>
           <div className={styles.cart_icon}>
             <CartIconBag width={35} height={25} color="#222" />
           </div>

@@ -8,20 +8,45 @@ import {
 } from '../../api/store';
 import { getData, storeData } from '../../util/storage';
 import { StoreRequestModel, ProductRequestModel } from '../models/store.model';
-import { socket } from './AuthContext';
+import { addToCart, checkout, fetchCart, makePayment } from '../../api/cart';
+import {
+  CartRequestModel,
+  CheckoutRequestModel,
+  OrderDetailsModel,
+  PaymentRequestResponse,
+  PaymentRequestModel,
+} from '../models/cart.model';
 
 interface Props {
   children: React.ReactNode;
 }
-
+export interface CartItems {
+  cartId: string;
+  productId: number;
+  buyerPubKey: null;
+  buyerUsername: string;
+  amount: number;
+  itemCount: number;
+  total: number;
+  storeId: number;
+}
 interface IStoreContext {
   storeName: string;
   isLoading: boolean;
   handleCreateStore: (data: StoreRequestModel) => void;
   handleAddProduct: (data: ProductRequestModel) => void;
-  handleGetAllProducts: () => void;
-  setStoreName: (data: any) => void;
+  handleGetAllProducts: (data: string|string[]) => string|string[];
+  handleAddToCart: (data: CartRequestModel) => void;
+  setStoreName: (data: string | string[]) => void;
   products: ProductRequestModel[];
+  handleFetchCart: () => void;
+  cartItems: CartItems[];
+  isFetchingInvoice: boolean;
+  orderDetails: OrderDetailsModel;
+  orderTotal: number;
+  addresses: PaymentRequestResponse;
+  handleCartCheckout: (data: CheckoutRequestModel) => void;
+  handlePayment: (data: PaymentRequestModel) => void;
 }
 
 const defaultState = {
@@ -30,8 +55,25 @@ const defaultState = {
   products: [],
   handleCreateStore: (data: StoreRequestModel) => {},
   handleAddProduct: (data: ProductRequestModel) => {},
-  handleGetAllProducts: () => {},
-  setStoreName: () => {},
+  handleGetAllProducts: (data: string|string[]) => data,
+  setStoreName: (data:string|string[]) => {},
+  handleFetchCart: () => { },
+  cartItems: [],
+  handleAddToCart: (data: CartRequestModel) => { },
+  isFetchingInvoice: false,
+  orderDetails: {
+    orderId: '',
+    email: '',
+    phoneNumber: '',
+    address: '',
+  },
+  orderTotal: 0,
+  addresses: {
+    bitcoinAddress: '',
+    lnInvoice: '',
+  },
+  handleCartCheckout: async (data: CheckoutRequestModel) => { },
+  handlePayment: (data: PaymentRequestModel) => { },
 };
 
 export const StoreContext = React.createContext<IStoreContext>(defaultState);
@@ -40,6 +82,14 @@ export const StoreContextProvider = ({ children }: Props) => {
   const [storeName, setStoreName] = useState(defaultState.storeName);
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
   const [products, setProducts] = useState(defaultState.products);
+  const [cartItems, setCartItems] = useState(defaultState.cartItems);
+  const [isFetchingInvoice, setIsFetchingInvoice] = useState(
+    defaultState.isFetchingInvoice
+  );
+  const [orderDetails, setOrderDetails] = useState(defaultState.orderDetails);
+  const [orderTotal, setOrderTotal] = useState(defaultState.orderTotal);
+  const [addresses, setAddresses] = useState(defaultState.addresses);
+
 
   const router = useRouter()
 
@@ -72,26 +122,56 @@ export const StoreContextProvider = ({ children }: Props) => {
   };
 
   const handleAddProduct = async (data: ProductRequestModel) => {
-    console.log('handleAddProduct ', data);
     let response = await createProduct(data);
 
     let isData = Object.keys(response.data);
     if (isData.length > 0) {
-      handleGetAllProducts();
+      handleGetAllProducts(storeName);
     }
-
-    console.log('handleAddProduct ', { res: response.data, isData });
   };
 
-  const handleGetAllProducts = async () => {
+  const handleGetAllProducts = async (storeName: string) => {
     let response = await fetchProducts(storeName);
 
-    console.log('handleGetAllProducts ', response);
     if (response) {
       setProducts(response.data.products.data);
       setStoreName(response.data.name);
     }
   };
+
+  const handleFetchCart =  useCallback(async () => {
+    let res = await fetchCart();
+    if (cartItems !== res.data) {
+      setCartItems(res.data);
+    }
+  }, [cartItems]);
+
+  const handleAddToCart = async (data: CartRequestModel) => {
+    let res = await addToCart(data);
+    handleFetchCart();
+  };
+
+  const handleCartCheckout = async (data: CheckoutRequestModel) => {
+    setIsFetchingInvoice(true);
+    let res = await checkout(data);
+    await setOrderDetails(res.data.data.orderDetails);
+    await setOrderTotal(res.data.data.orderTotal);
+  };
+
+  const handlePayment = useCallback(async (data: PaymentRequestModel) => {
+    let req = {
+      orderId: data.orderId,
+      orderTotal: data.orderTotal,
+      bitcoins: data.bitcoins,
+      sats: data.sats,
+    };
+    let res = await makePayment(req);
+    if (res?.data?.data) {
+      setAddresses(res.data.data);
+    }
+    setIsFetchingInvoice(false);
+    return res;
+  }, []);
 
   const contextValue = {
     storeName,
@@ -101,6 +181,16 @@ export const StoreContextProvider = ({ children }: Props) => {
     handleCreateStore,
     handleAddProduct,
     handleGetAllProducts,
+    handleFetchCart,
+    cartItems,
+    setCartItems,
+    handleAddToCart,
+    isFetchingInvoice,
+    orderDetails,
+    orderTotal,
+    handleCartCheckout,
+    addresses,
+    handlePayment
   };
 
   return (

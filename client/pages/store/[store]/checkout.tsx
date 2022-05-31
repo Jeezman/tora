@@ -1,15 +1,15 @@
 import { useState, useContext, useEffect } from 'react';
 import { Button } from '../../../components/shared/Button';
 import styles from '../../../styles/Store.module.css';
-import { CartContext } from '../../context/CartContext';
 import { CheckoutRequestModel } from '../../models/cart.model';
 import { useRouter } from 'next/router';
 import { PaymentModal } from '../../../components/PaymentModal';
 import { useGetBTCPrice } from '../../../components/shared/useGetBTCPrice';
+import { StoreContext } from '../../context/StoreContext';
 
 const Checkout = () => {
   const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment, orderDetails, orderTotal } =
-    useContext(CartContext);
+    useContext(StoreContext);
   
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

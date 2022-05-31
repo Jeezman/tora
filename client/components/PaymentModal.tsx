@@ -2,8 +2,8 @@ import { useState, ReactNode, useContext } from 'react';
 import { SpinnerIcon } from '../assets/icons';
 import Modal from './shared/Modal';
 import styles from '../styles/PaymentModal.module.css';
-import { CartContext } from '../pages/context/CartContext';
 import { QRCodeSVG } from 'qrcode.react';
+import { StoreContext } from '../pages/context/StoreContext';
 
 type Props = {
   show?: boolean;
@@ -35,7 +35,7 @@ const CHAIN = {
 };
 
 export const PaymentModal = ({ show, close }: Props) => {
-  const { isFetchingInvoice, addresses } = useContext(CartContext);
+  const { isFetchingInvoice, addresses } = useContext(StoreContext);
   const [chain, setChain] = useState(CHAIN.bitcoin);
   const handleSubmit = () => {};
   return (

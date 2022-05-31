@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState, memo, useRef } from 'react';
 import { CartIcon, CartIconBag } from '../../assets/icons';
 import { Button } from '../../components/shared/Button';
 import { ProductCard } from '../../components/shared/ProductCard';
 import styles from '../../styles/Store.module.css';
-import { CartContext } from '../context/CartContext';
 import { StoreContext } from '../context/StoreContext';
 import { useRouter } from 'next/router';
 import CartList from '../../components/CartList';
@@ -16,28 +15,36 @@ function Store() {
     products,
     storeName,
     setStoreName,
+    handleAddToCart,
+    handleFetchCart,
+    cartItems,
+    handleCartCheckout
   } = useContext(StoreContext);
-  const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout } =
-    useContext(CartContext);
   const [sidebarActive, setSidebarActive] = useState(false);
+  const MOUNTED = useRef(true);
 
   const router = useRouter();
+
+  useEffect(() => () => { MOUNTED.current = false; }, [])
+
+  useEffect(() => {
+    if(MOUNTED.current && router.query.store) {
+      setStoreName(router.query.store);
+      handleGetAllProducts(router.query.store)
+      storeData('store', JSON.stringify(router.query.store));
+      MOUNTED.current = true;
+    }
+  }, [handleGetAllProducts, router.query.store, setStoreName]);
+
+  useEffect(() => {
+    if (MOUNTED.current) {
+      handleFetchCart();
+      MOUNTED.current = true;
+    }
+  }, [handleFetchCart]);
   
-   useEffect(() => {
-     setStoreName(router.query.store)
-     storeData('store', String(router.query.store))
-  }, [router.query.store, setStoreName]);
-
-  useEffect(() => {
-    if (!!storeName) handleGetAllProducts();
-  }, [ storeName]);
-
-  useEffect(() => {
-    handleFetchCart();
-  }, []);
 
   const onAddToCart = (product: any) => {
-    console.log('handleProductClick ', product);
     let data = {
       productId: product.productId,
       amount: product.amount,
@@ -50,7 +57,6 @@ function Store() {
   };
 
   const handleCheckout = () => {
-    alert('checking out');
     router.push(`/store/${router.query.store}/checkout`)
   };
 
@@ -100,4 +106,4 @@ function Store() {
   );
 }
 
-export default Store;
+export default memo(Store);
