@@ -56,3 +56,20 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
         next(err);
     }
 };
+
+export const generatePin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const pin = Math.floor(1000 + Math.random() * 9000);
+
+        return responseSuccess(res, 200, 'Successfully created payment address and invoice', pin);
+
+    } catch (err) {
+        next(err);
+    }
+};
