@@ -125,4 +125,24 @@ export namespace DB {
         type: string;
         userId?: number;
     }
+
+    export interface CrowdPayments {
+        id?: number;
+        orderId: string;
+        paymentId: string;
+        paymentPin: number;
+        totalAmount: number;
+        amountPaid: number;
+        date_created: string;
+        date_updated: string;
+    }
+
+    export interface CrowdAddressLogs {
+        id?: number;
+        paymentId: string;
+        amount: number;
+        address: string;
+        invoice?: string;
+        date_updated: string;
+    }
 }

@@ -83,10 +83,43 @@ export const makeCrowdPayment = async (req: Request, res: Response, next: NextFu
             return responseErrorValidation(res, 400, errors.array());
         }
 
-        const orderId = req.body.orderId;
-        const paymentId = req.body.paymentId;
+        const orderId: string = req.body.orderId;
+        const paymentId: string = req.body.paymentId;
+        const paymentPin: number = req.body.paymentPin;
+
+        // Get the order 
+        const orders: DB.Order[] = await knex<DB.Order>('Order').where({ orderId });
+        if(!orders.length) {
+            return responseError(res, 404, 'Not a valid order');
+        }
+
+        const totalAmount = orders[0].orderTotal;
+
+        await knex<DB.CrowdPayments>('PaymentsCrowd').insert({ paymentId, orderId, totalAmount, paymentPin });
 
         return responseSuccess(res, 200, 'Successfully created crowd payment', {});
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getCrowdPayment = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const paymentPin: number  = Number(req.params.code);
+
+        if(!paymentPin) {
+            return responseError(res, 404, 'Payment not found');
+        }
+        const crowdPayment = await knex<DB.CrowdPayments>('PaymentsCrowd').where({ paymentPin }).first();
+
+        return responseSuccess(res, 200, 'Successfully created crowd payment', crowdPayment);
 
     } catch (err) {
         next(err);
