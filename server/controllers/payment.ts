@@ -73,3 +73,22 @@ export const generatePin = async (req: Request, res: Response, next: NextFunctio
         next(err);
     }
 };
+
+
+export const makeCrowdPayment = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+        // Finds the validation errors in this request and wraps them in an object with handy functions
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return responseErrorValidation(res, 400, errors.array());
+        }
+
+        const orderId = req.body.orderId;
+        const paymentId = req.body.paymentId;
+
+        return responseSuccess(res, 200, 'Successfully created crowd payment', {});
+
+    } catch (err) {
+        next(err);
+    }
+};
