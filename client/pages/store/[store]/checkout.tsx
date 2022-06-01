@@ -22,6 +22,7 @@ const Checkout = () => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [sidebarActive, setSidebarActive] = useState(true);
 
   const data = useGetBTCPrice({ amount: orderTotal || 0 });
 
@@ -66,7 +67,7 @@ const Checkout = () => {
     orderTotal,
   ]);
 
-  const canPay = Boolean(email) && Boolean(phone) && Boolean(address)
+  const canPay = Boolean(email) && Boolean(phone) && Boolean(address);
 
   return (
     <section className={styles.container}>
@@ -113,8 +114,45 @@ const Checkout = () => {
         </Button>
       </div>
       {orderTotal > 0 && (
-        <PaymentModal data={data} show={showPaymentModal} close={closeModal} />
+        <PaymentModal
+          data={data}
+          show={showPaymentModal}
+          close={closeModal}
+          showCrowdFund={() => setSidebarActive(true)}
+        />
       )}
+      <section className={styles.main_sidebar}>
+        <div
+          className={`${styles.cart_sidebar} ${
+            sidebarActive ? styles.active : ''
+          }`}
+        >
+          <h1 className="mb-4 text-2xl font-bold">Crowdfund Shopping Cart</h1>
+          <p className="mb-2 text-lg">
+            Share payment link with friends or family
+          </p>
+          <div className={styles.cf_content}>
+            <div className={styles.cf_input_wrap}>
+              <input
+                className={styles.cf_input}
+                placeholder="localhost:3000/taro/crowdpayments"
+                value="localhost:3000/taro/crowdpayments"
+              />
+              <button className={styles.cf_share_btn}>Copy</button>
+            </div>
+            <div className={styles.cf_pin_wrap}>
+              <p className="text-lg text-center uppercase font-bold text-black opacity-75">
+                Pin
+              </p>
+              <h1 className={styles.cf_pin}>4231</h1>
+            </div>
+          </div>
+        </div>
+        <div
+          onClick={() => setSidebarActive(!sidebarActive)}
+          className={styles.cart_sidebar_overlay}
+        ></div>
+      </section>
     </section>
   );
 };

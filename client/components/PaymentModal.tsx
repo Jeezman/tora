@@ -5,6 +5,7 @@ import styles from '../styles/PaymentModal.module.css';
 import { QRCodeSVG } from 'qrcode.react';
 import { StoreContext } from '../pages/context/StoreContext';
 import { commaify } from '../util/commaify';
+import { Button } from './shared/Button';
 
 type Props = {
   show?: boolean;
@@ -12,6 +13,7 @@ type Props = {
   footer?: ReactNode;
   actions?: ReactNode;
   close: () => void;
+  showCrowdFund: () => void;
   //   onSubmit: (data: ProductRequestModel) => void;
 
   /* styles */
@@ -42,7 +44,7 @@ const CHAIN = {
   lightning: 'LIGHTNING',
 };
 
-export const PaymentModal = ({ show, close, data }: Props) => {
+export const PaymentModal = ({ show, close, data, showCrowdFund }: Props) => {
   const { isFetchingInvoice, addresses } = useContext(StoreContext);
   const [chain, setChain] = useState(CHAIN.bitcoin);
   const handleSubmit = () => {};
@@ -59,6 +61,11 @@ export const PaymentModal = ({ show, close, data }: Props) => {
         showFooter={false}
       >
         <section className={styles.content}>
+          <div className={styles.crowdfundBtn}>
+            <Button disabled={false} onClick={showCrowdFund}>
+              Crowd Fund
+            </Button>
+          </div>
           {isFetchingInvoice ? (
             <aside className={styles.loading_container}>
               <SpinnerIcon size={40} color="#444" />
