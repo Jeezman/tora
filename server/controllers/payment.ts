@@ -94,9 +94,9 @@ export const makeCrowdPayment = async (req: Request, res: Response, next: NextFu
             return responseError(res, 404, 'Not a valid order');
         }
 
-        const totalAmount = orders[0].orderTotal;
+        const totalamount = orders[0].orderTotal;
 
-        await knex<DB.CrowdPayments>('PaymentsCrowd').insert({ paymentId, orderId, totalAmount, paymentPin });
+        await knex<DB.CrowdPayments>('PaymentsCrowd').insert({ paymentId, orderId, totalamount, paymentPin });
 
         const data = {
             orderId,

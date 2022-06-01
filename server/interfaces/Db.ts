@@ -131,9 +131,9 @@ export namespace DB {
         orderId: string;
         paymentId: string;
         paymentPin: number;
-        totalAmount: number;
-        amountPaid: number;
-        amountInBtc: number;
+        totalamount: number;
+        amountpaid: number;
+        amountinbtc: number;
         date_created: string;
         date_updated: string;
     }
@@ -144,6 +144,18 @@ export namespace DB {
         amount: number;
         address: string;
         invoice?: string;
+        status: string;
+        date_created?: string;
         date_updated: string;
+    }
+
+    export interface CrowdTransactions {
+        id?: number;
+        paymentId: string;
+        amount: number;
+        txid: string;
+        invoice?: string;
+        status: number;
+        date_created?: string;
     }
 }
