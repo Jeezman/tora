@@ -66,6 +66,8 @@ const Checkout = () => {
     orderTotal,
   ]);
 
+  const canPay = Boolean(email) && Boolean(phone) && Boolean(address)
+
   return (
     <section className={styles.container}>
       <h1 className="text-6xl">Checkout</h1>
@@ -106,7 +108,7 @@ const Checkout = () => {
             className=" form-control block w-full  px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           />
         </div>
-        <Button disabled={false} onClick={handleCheckout}>
+        <Button disabled={!canPay} onClick={handleCheckout}>
           Pay
         </Button>
       </div>
