@@ -133,6 +133,7 @@ export namespace DB {
         paymentPin: number;
         totalAmount: number;
         amountPaid: number;
+        amountInBtc: number;
         date_created: string;
         date_updated: string;
     }
