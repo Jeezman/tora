@@ -8,60 +8,68 @@ import { useGetBTCPrice } from '../../../components/shared/useGetBTCPrice';
 import { StoreContext } from '../../context/StoreContext';
 
 const Checkout = () => {
-  const { handleAddToCart, handleFetchCart, cartItems, handleCartCheckout, handlePayment, orderDetails, orderTotal } =
-    useContext(StoreContext);
-  
+  const {
+    handleAddToCart,
+    handleFetchCart,
+    cartItems,
+    handleCartCheckout,
+    handlePayment,
+    orderDetails,
+    orderTotal,
+  } = useContext(StoreContext);
+
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
-  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  console.log('order total ', orderTotal);
-
-  const data = useGetBTCPrice({ amount: cartItems[0]?.total || 0 })
-  
-  console.log('sats data ', data)
+  const data = useGetBTCPrice({ amount: orderTotal || 0 });
 
   const router = useRouter();
-  
-  console.log('router ', router);
-    
+
   const handleCheckout = async () => {
     let data = {
       email,
       phoneNumber: phone,
       address,
       cartId: cartItems[0].cartId,
-      storeName: router.query.store
-    }
-    showModal()
-    handleCartCheckout(data)
-  }
+      storeName: router.query.store,
+    };
+    await handleCartCheckout(data);
+    showModal();
+  };
 
   const closeModal = () => {
-    setShowPaymentModal(false)
-  }
+    setShowPaymentModal(false);
+    router.push(`/store/${router.query.store}`);
+  };
 
   const showModal = () => {
-    setShowPaymentModal(true)
-  }
+    setShowPaymentModal(true);
+  };
 
-  useEffect(() => { 
+  useEffect(() => {
     if (orderDetails.orderId) {
       let requestData = {
         orderId: orderDetails.orderId,
         orderTotal,
         bitcoins: data.usdToBTC,
-        sats: data.usdToSats
-      }
-      handlePayment(requestData)
+        sats: data.usdToSats,
+      };
+      handlePayment(requestData);
     }
-  }, [data?.usdToBTC, data?.usdToSats, handlePayment, orderDetails.orderId, orderTotal])
+  }, [
+    data?.usdToBTC,
+    data?.usdToSats,
+    handlePayment,
+    orderDetails.orderId,
+    orderTotal,
+  ]);
 
   return (
     <section className={styles.container}>
       <h1 className="text-6xl">Checkout</h1>
-      <div className='mb-2 w-2/5'>
+      <div className="mb-2 w-2/5">
         <div className="mb-6 mt-10">
           <label htmlFor="email" className="mb-[3px] block text-gray-600">
             Email
@@ -98,9 +106,13 @@ const Checkout = () => {
             className=" form-control block w-full  px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
           />
         </div>
-        <Button disabled={false} onClick={handleCheckout}>Pay</Button>
+        <Button disabled={false} onClick={handleCheckout}>
+          Pay
+        </Button>
       </div>
-      <PaymentModal show={showPaymentModal} close={closeModal} />
+      {orderTotal > 0 && (
+        <PaymentModal data={data} show={showPaymentModal} close={closeModal} />
+      )}
     </section>
   );
 };

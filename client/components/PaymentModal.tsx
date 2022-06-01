@@ -4,6 +4,7 @@ import Modal from './shared/Modal';
 import styles from '../styles/PaymentModal.module.css';
 import { QRCodeSVG } from 'qrcode.react';
 import { StoreContext } from '../pages/context/StoreContext';
+import { commaify } from '../util/commaify';
 
 type Props = {
   show?: boolean;
@@ -27,17 +28,27 @@ type Props = {
   bgHeader?: boolean;
   small?: boolean;
   fixedHeight?: boolean;
+  data: Data;
 };
+
+interface Data {
+  usd?: number;
+  usdToSats?: number;
+  usdToBTC?: number;
+}
 
 const CHAIN = {
   bitcoin: 'BITCOIN',
   lightning: 'LIGHTNING',
 };
 
-export const PaymentModal = ({ show, close }: Props) => {
+export const PaymentModal = ({ show, close, data }: Props) => {
   const { isFetchingInvoice, addresses } = useContext(StoreContext);
   const [chain, setChain] = useState(CHAIN.bitcoin);
   const handleSubmit = () => {};
+
+  const formattedPriceInSats = Number(data.usdToSats?.toFixed(0));
+  console.log('formattedPriceInSats ', formattedPriceInSats);
   return (
     <div className={styles.container} onClick={close}>
       <Modal
@@ -84,16 +95,15 @@ export const PaymentModal = ({ show, close }: Props) => {
                 </div>
               </div>
               <div className="border rounded-md mt-10 mx-2 px-10 py-5 flex flex-col justify-center items-center">
-                <h2 className="text-3xl">0.000868 BTC</h2>
-                <h5 className="text-black text-lg opacity-75 mb-6">$25 USD</h5>
+                <h2 className="text-3xl">
+                  {commaify(formattedPriceInSats)} Sats
+                </h2>
+                <h5 className="text-black text-lg opacity-75 mb-6">
+                  ${data.usd} USD
+                </h5>
                 {chain === CHAIN.bitcoin ? (
                   <>
-                    <QRCodeSVG
-                      value={
-                        addresses.lnInvoice
-                      }
-                      size={300}
-                    />
+                    <QRCodeSVG value={addresses.lnInvoice} size={300} />
                     <h2 className="mt-6 uppercase text-gray-600">
                       Bitcoin Address
                     </h2>
@@ -103,12 +113,7 @@ export const PaymentModal = ({ show, close }: Props) => {
                   </>
                 ) : (
                   <>
-                    <QRCodeSVG
-                      value={
-                        addresses.lnInvoice
-                      }
-                      size={300}
-                    />
+                    <QRCodeSVG value={addresses.lnInvoice} size={300} />
                     <h2 className="mt-6 uppercase text-gray-600">
                       Lightning Invoice
                     </h2>
