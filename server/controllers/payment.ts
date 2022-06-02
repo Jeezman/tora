@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { DB } from '../interfaces/Db';
 import { responseSuccess, responseErrorValidation, responseError } from '../helpers';
 import { v4 } from 'uuid';
-import {createInvoice, createAddress, subscribeToInvoice} from '../helpers/paymentHelper';
+import { createInvoice, createAddress, subscribeToInvoice } from '../helpers/paymentHelper';
 import 'dotenv/config';
 import { AddInvoiceResponse } from '@radar/lnrpc';
 
@@ -34,12 +34,12 @@ export const generateInvoice = async (req: Request, res: Response, next: NextFun
 
         // Check if order exists
         const orders: DB.Order[] = await knex<DB.Order>('Order').where({ orderId, orderTotal: totalAmount });
-        
-        if(orders.length === 0) {
+
+        if (orders.length === 0) {
             return responseError(res, 404, 'Not a valid order');
         }
 
-        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId,  orderId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest, totalAmount, amountInBtc, amountInSats });
+        await knex<DB.OrderPayment>('OrderPayments').insert({ paymentId, orderId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest, totalAmount, amountInBtc, amountInSats });
 
         await knex<DB.OrderInvoiceLog>('OrderInvoiceLogs').insert({ paymentId, address: bitcoinAddress, invoice: lnInvoice.paymentRequest });
 
@@ -90,7 +90,7 @@ export const makeCrowdPayment = async (req: Request, res: Response, next: NextFu
 
         // Get the order 
         const orders: DB.Order[] = await knex<DB.Order>('Order').where({ orderId });
-        if(!orders.length) {
+        if (!orders.length) {
             return responseError(res, 404, 'Not a valid order');
         }
 
@@ -119,12 +119,19 @@ export const getCrowdPayment = async (req: Request, res: Response, next: NextFun
             return responseErrorValidation(res, 400, errors.array());
         }
 
-        const paymentPin: number  = Number(req.params.code);
+        const paymentCheck: number | string = req.params.check;
 
-        if(!paymentPin) {
+        let crowdPayment: DB.CrowdPayments | undefined;
+
+        if (!paymentCheck) {
             return responseError(res, 404, 'Payment not found');
+        } else if (isNaN(Number(paymentCheck))) {
+            crowdPayment = await knex<DB.CrowdPayments>('PaymentsCrowd')
+                .select('paymentId', 'orderId', 'totalamount', 'paidamount')
+                .where({ paymentId: String(paymentCheck) }).first();
+        } else if (typeof Number(paymentCheck) === 'number') {
+            crowdPayment = await knex<DB.CrowdPayments>('PaymentsCrowd').where({ paymentPin: Number(paymentCheck) }).first();
         }
-        const crowdPayment = await knex<DB.CrowdPayments>('PaymentsCrowd').where({ paymentPin }).first();
 
         return responseSuccess(res, 200, 'Successfully got crowd payment', crowdPayment);
 
@@ -141,10 +148,10 @@ export const createCrowdPayment = async (req: Request, res: Response, next: Next
             return responseErrorValidation(res, 400, errors.array());
         }
 
-        const paymentId: string  = req.params.paymentId;
+        const paymentId: string = req.params.paymentId;
         const amount: number = req.body.amount;
 
-        if(!paymentId) {
+        if (!paymentId) {
             return responseError(res, 404, 'Payment not found');
         }
 

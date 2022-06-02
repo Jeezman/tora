@@ -14,7 +14,7 @@ router.get('/generatepin', generatePin);
 
 router.post('/crowd', makeCrowdPayment);
 
-router.get('/crowd/:code', getCrowdPayment);
+router.get('/crowd/:check', getCrowdPayment);
 
 router.post('/create/:paymentId', createCrowdPayment);
 

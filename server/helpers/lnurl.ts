@@ -1,5 +1,8 @@
-const lnurl = require('lnurl');
+// const lnurl = require('lnurl');
+import lnurl from 'lnurl';
 import 'dotenv/config';
+import { LnurlpayRes } from '../interfaces/Lnurl';
+import { subscribeToInvoice } from './paymentHelper';
 
 const lnurlServer = lnurl.createServer({
     host:"localhost",
@@ -30,5 +33,15 @@ const lnurlServer = lnurl.createServer({
 		},
 	},
 });
+
+lnurlServer.on('payRequest:action:processed', function(event: LnurlpayRes) {
+	const { secret, params, result } = event;
+	const { id, invoice } = result;
+
+	subscribeToInvoice(invoice);
+	// `id` - non-standard reference ID for the new invoice, can be NULL if none provided
+	// `invoice` - bolt11 invoice
+});
+
 
 export default lnurlServer;
