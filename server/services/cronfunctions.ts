@@ -7,6 +7,27 @@ import { emitSocketEvent } from '../config/socket';
 
 const noOfCon = Number(process.env.NO_OF_CONFIRMATIONS);
 
+
+// Update Balance and Transaction logs
+export const updateCrowdBalance = async (paymentId: string, txid: string, amount: number, address: string) => {
+    try {
+        // Update the Crowd Balance with the transaction amount
+        await knex<DB.CrowdPayments>('PaymentsCrowd').update({ amountinbtc: knex.raw(`amountinbtc + ${Number(amount)}`) }).where({ paymentId });
+
+        // Update the Crowd logs
+        await knex<DB.CrowdAddressLogs>('CrowdAddressLogs').where({ address }).update({ status: 'settled' });
+
+        // Update the transaction status in transaction log
+        await knex<DB.CrowdTransactions>('CrowdTransactions').update({ status: 1 }).where({ txid: txid });
+
+        // Send payment success event
+        // emitSocketEvent.emit('paymentsuccess', amount);
+    } catch (err) {
+        // Log Error
+        console.log('Update Balance Error ===', (err as Error).message);
+    }
+}
+
 // Update Balance and Transaction logs
 export const updateBalanceAndTransaction = async (userId: number, address: string, txid: string, amount: number) => {
     try {
@@ -84,3 +105,56 @@ export const getReceived = async () => {
         console.log('Wallet Receive Error ===', (err as Error).message);
     }
 }
+
+export const getCrowdReceived = async () => {
+    try {
+        const transactions: TransactionResult[] = await (await bitrpc.getTransactions('torawallet')).data.result;
+
+        transactions.forEach(async trans => {
+            // Set the crowd address
+            const address: string = trans.address;
+
+            // Get the payment address;
+            const crowdLogs: DB.CrowdAddressLogs[] = await knex<DB.CrowdAddressLogs>('CrowdAddressLogs').where({ address });
+
+            if (crowdLogs.length === 1) {
+                const paymentId = crowdLogs[0].paymentId;
+
+                // Get the crowd payment
+                const crowdPayment: DB.CrowdPayments[] = await knex<DB.CrowdPayments>('PaymentsCrowd').where({ paymentId });
+
+                // Check if the transaction has been added to the database log, if not add it
+                const alltrans: DB.TransactionLogs[] = await knex<DB.TransactionLogs>('Transactions').where({ txid: trans.txid });
+
+                // If the transaction is a receive category
+                if (trans.category === 'receive') {
+                    if (alltrans.length === 0) {
+                        await knex<DB.CrowdTransactions>('CrowdTransactions').insert({
+                            paymentId,
+                            amount: trans.amount,
+                            txid: trans.txid,
+                            status: 0,
+                        });
+                    }
+                }
+
+                // If the transaction meets the confirmation target
+                if (trans.confirmations === noOfCon && Number(alltrans[0].status) === 0) {
+                    // Update transaction logs and balance
+                    await updateCrowdBalance(paymentId, trans.txid, trans.amount, address);
+
+                } else if (trans.confirmations > noOfCon) {
+                    // If the confirmation is greater than no of confirmation and it is not existent in our users transaction logs
+                    if (alltrans.length === 1 && Number(alltrans[0].status) === 0) {
+                        // Update transaction logs and balance
+                        await updateCrowdBalance(paymentId, trans.txid, trans.amount, address);
+                    }
+                }
+            }
+        });
+    } catch (err) {
+        // Log Error
+        console.log('Wallet Receive Error ===', (err as Error).message);
+    }
+}
+

@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { deleteFromCart, addToCart, updateCart, listCart, cartCheckout, deleteAllFromCart } from '../../controllers/cart';
+import { 
+    deleteFromCart, 
+    addToCart, 
+    updateCart, 
+    listCart, 
+    cartCheckout, 
+    deleteAllFromCart 
+} from '../../controllers/cart';
 const router = Router();
 
 router.post('/add', addToCart);

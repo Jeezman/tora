@@ -30,6 +30,22 @@ export const createAddress = async (): Promise<string> => {
     return address;
 };
 
+export const subscribeCrowdPayment = async (invoice: AddInvoiceResponse) => {
+    const rpc = await lndClient;
+
+     // Subscribe to invoice
+     const subscribe = await rpc.subscribeInvoices({
+        addIndex: invoice.addIndex,
+    });
+
+    subscribe.on('data', async (response) => {
+        const paymentValue = Number(response.value);
+        if (response.settled) {
+            
+        }
+    });
+}
+
 export const subscribeToInvoice = async (invoice: AddInvoiceResponse) => {
     const rpc = await lndClient;
 
