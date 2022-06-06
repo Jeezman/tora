@@ -11,26 +11,9 @@ import { walletCheck } from './services/wallet';
 import { cron } from './services/cron';
 import 'dotenv/config';
 import socket from './config/socket';
-// import lnurlServer from './helpers/lnurl';
 
 const app: Application = express();
 const server: http.Server = http.createServer(app);
-
-// const tag = 'payRequest';
-// const params = {
-//     minSendable: 10000,
-//     maxSendable: 200000,
-//     metadata: '[["text/plain", "lnurl-node"]]',
-//     commentAllowed: 500,
-// };
-
-// lnurlServer.generateNewUrl(tag, params).then((result: any) => {
-//     const { encoded, secret, url } = result;
-//     console.log({ encoded, secret, url });
-// }).catch((err: Error) => {
-//     console.error((err as Error));
-// });
-
 
 // Create Tora wallet
 walletCheck();

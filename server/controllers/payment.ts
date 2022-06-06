@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 import { createInvoice, createAddress, subscribeToInvoice } from '../helpers/paymentHelper';
 import 'dotenv/config';
 import { AddInvoiceResponse } from '@radar/lnrpc';
+import lnurlServer from '../helpers/lnurl';
 
 // Controller to generate lightning invoice and Bitcoin address
 export const generateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -85,8 +86,21 @@ export const makeCrowdPayment = async (req: Request, res: Response, next: NextFu
 
         const orderId: string = req.body.orderId;
         const paymentPin: number = req.body.paymentPin;
+        const amountInSats: number = req.body.sats;
 
         const paymentId: string = v4().substring(0, 12).replace(/\-|\./g, '');
+
+        // Generate lnurl auth
+        const tag = 'payRequest';
+
+        const params = {
+            minSendable: 500,
+            maxSendable: amountInSats,
+            metadata: `[["text/plain", "lnurl-node", ${paymentId}]]`,
+            commentAllowed: 500,
+        };
+
+        const lnurl = await lnurlServer.generateNewUrl(tag, params);
 
         // Get the order 
         const orders: DB.Order[] = await knex<DB.Order>('Order').where({ orderId });
@@ -96,12 +110,13 @@ export const makeCrowdPayment = async (req: Request, res: Response, next: NextFu
 
         const totalamount = orders[0].orderTotal;
 
-        await knex<DB.CrowdPayments>('PaymentsCrowd').insert({ paymentId, orderId, totalamount, paymentPin });
+        await knex<DB.CrowdPayments>('PaymentsCrowd').insert({ paymentId, orderId, totalamount, paymentPin, lnurl: lnurl.encoded });
 
         const data = {
             orderId,
             paymentId,
-            paymentPin
+            paymentPin,
+            lnurl: lnurl.encoded
         };
 
         return responseSuccess(res, 200, 'Successfully created crowd payment', data);
@@ -155,6 +170,10 @@ export const createCrowdPayment = async (req: Request, res: Response, next: Next
             return responseError(res, 404, 'Payment not found');
         }
 
+        const payment = await knex<DB.CrowdPayments>('PaymentsCrowd')
+            .select('paymentId', 'lnurl')
+            .where({ paymentId }).first();
+
         const address = await createAddress();
 
         await knex<DB.CrowdAddressLogs>('CrowdAddressLogs').insert({
@@ -163,7 +182,12 @@ export const createCrowdPayment = async (req: Request, res: Response, next: Next
             address
         });
 
-        return responseSuccess(res, 200, 'Successfully created crowd payment', { address });
+        const data = {
+            address,
+            invoice: payment?.lnurl
+        };
+
+        return responseSuccess(res, 200, 'Successfully created payment', data);
 
     } catch (err) {
         next(err);
