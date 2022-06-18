@@ -32,6 +32,7 @@ interface IAuthContext {
   isLoading: boolean;
   handleLogin: (data: LoginRequestModel) => void;
   handleRegister: (data: RegisterRequestModel) => void;
+  handleLogout: () => void;
   handleLoginWithLN: () => void;
   lnData: LNData;
 }
@@ -41,6 +42,7 @@ const defaultState = {
   isLoading: false,
   handleLogin: (data: LoginRequestModel) => {},
   handleRegister: (data: RegisterRequestModel) => {},
+  handleLogout: () => {},
   handleLoginWithLN: () => {},
   lnData: { encoded: '', secret: '', url: '' },
 };
@@ -86,6 +88,10 @@ export const AuthContextProvider = ({ children }: Props) => {
       setIsLoading(false);
     }
   };
+  
+  const handleLogout = async () => {
+    return router.push('/');
+  }
 
   const handleRegister = async (data: RegisterRequestModel) => {
     setIsLoading(true);
@@ -103,6 +109,7 @@ export const AuthContextProvider = ({ children }: Props) => {
     console.log('handleLoginWithLN response ', response.data);
     setLnData(response.data);
   };
+  
   useEffect(() => {
     const _getData = async () => {
       let token = await getData('token');
@@ -119,6 +126,7 @@ export const AuthContextProvider = ({ children }: Props) => {
     setIsLoggedIn,
     isLoading,
     handleLogin,
+    handleLogout,
     handleRegister,
     lnData,
     handleLoginWithLN,
