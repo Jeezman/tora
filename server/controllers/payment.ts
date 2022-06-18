@@ -75,7 +75,6 @@ export const generatePin = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-
 export const makeCrowdPayment = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         // Finds the validation errors in this request and wraps them in an object with handy functions
