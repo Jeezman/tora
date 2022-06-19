@@ -1,41 +1,49 @@
-import React, { useContext, useEffect, useState, Fragment } from 'react';
+import React, {useContext, useEffect, useState, Fragment} from 'react';
 import Head from 'next/head';
-import { DashboardLayout, siteTitle } from '../../components/DashboardLayout';
+import {DashboardLayout, siteTitle} from '../../components/DashboardLayout';
 import styles from '../../styles/Dashboard.module.css';
-import { useRouter } from 'next/router';
-import { Button } from '../../components/shared/Button';
-import { Dialog, Transition } from '@headlessui/react';
-import { DashboardContext } from '../context/DashboardContext';
-import { BalanceCard } from '../../components/BalanceCard';
-import { TransactionTable } from '../../components/shared/TransactionsTable';
-import { StoreContext } from '../context/StoreContext';
+import {useRouter} from 'next/router';
+import {Button} from '../../components/shared/Button';
+import {Dialog, Transition} from '@headlessui/react';
+import {DashboardContext} from '../context/DashboardContext';
+import {BalanceCard} from '../../components/BalanceCard';
+import {TransactionTable} from '../../components/shared/TransactionsTable';
+import {StoreContext} from '../context/StoreContext';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 function Dashboard() {
   const router = useRouter();
-  const { handleCreateStore,handleGetUserBalance,balance } = useContext(DashboardContext);
-  const { storeName } = useContext(StoreContext);
+  const {handleCreateStore, handleGetUserBalance, balance} = useContext(DashboardContext);
+  const {storeName} = useContext(StoreContext);
   const [addStoreModal, setAddStoreModal] = useState(false);
   const [price, setPrice] = useState(false);
 
-  const { data, error } = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, { refreshInterval: 60000 });
+  const {data, error} = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, {refreshInterval: 60000});
 
   useEffect(() => {
     handleGetUserBalance()
   }, [])
 
   const handleCloseAddStoreModal = () => setAddStoreModal(false);
+  
   const onCreateStore = (name: string) => {
-    handleCreateStore({ name: name });
+    handleCreateStore({name: name});
     setAddStoreModal(false);
+  };
+  
+  const copyStoreLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/store/${storeName}`);
   };
 
   return (
     <section>
       <div className={styles.top}>
         <h1 className='text-2xl font-semibold'>Dashboard</h1>
-        <Button disabled={!!storeName} onClick={() => setAddStoreModal(true)}>{!!storeName ? `${storeName.toUpperCase()}` : `Create store`}</Button>
+        <section className={styles.button_wrap}>
+          <Button disabled={!!storeName} onClick={() => setAddStoreModal(true)}>{!!storeName ? `${storeName.toUpperCase()}` : `Create store`}</Button>
+          <Button className={'store_link'} disabled={false} onClick={copyStoreLink}>Copy link</Button>
+        </section>
       </div>
       <div className='flex w-1/2 justify-between my-10'>
         <BalanceCard title='Bitcoin Wallet' amount={balance} type={1} />
@@ -56,7 +64,7 @@ function Dashboard() {
 
 Dashboard.layout = DashboardLayout;
 
-function MyModal({ show, closeModal, handleSubmit }: any) {
+function MyModal({show, closeModal, handleSubmit}: any) {
   const [storeName, setStoreName] = useState('');
   return (
     <>
