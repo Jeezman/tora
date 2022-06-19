@@ -2,7 +2,7 @@ import { USDIcon } from '../assets/icons';
 import { commaify } from '../util/commaify';
 
 interface BalanceProps {
-  amount: number;
+  amount: number | string;
   title: string;
   type: number;
 }

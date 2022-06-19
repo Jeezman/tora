@@ -3,10 +3,22 @@
     width: 100%;
     height: 70px;
     margin-right: 144px;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
     border-bottom: 1px solid rgba(237,241,245,1);
     padding: 2rem 5rem;
+}
+
+.right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.right p {
+    margin-left: 15px;
+    font-weight: 500;
+    cursor: pointer;
 }
 
 .avatar {

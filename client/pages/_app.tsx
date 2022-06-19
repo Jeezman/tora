@@ -3,7 +3,6 @@ import type { AppProps } from 'next/app';
 import { AuthContextProvider, ProtectRoute } from './context/AuthContext';
 import { DashboardContextProvider } from './context/DashboardContext';
 import { StoreContextProvider } from './context/StoreContext';
-import { CartContextProvider } from './context/CartContext';
 import { socket } from './context/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -32,13 +31,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <AuthContextProvider>
       <DashboardContextProvider>
         <StoreContextProvider>
-          <CartContextProvider>
             <ProtectRoute>
               <Layout>
                 <Component {...pageProps} />
               </Layout>
             </ProtectRoute>
-          </CartContextProvider>
         </StoreContextProvider>
       </DashboardContextProvider>
     </AuthContextProvider>

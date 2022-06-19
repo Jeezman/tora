@@ -49,3 +49,14 @@
   text-align: center;
   color: #1d222c;
 }
+.cart_image {
+  border: 1px solid rgba(59, 62, 59, 0.1);
+  border-radius: 5px;
+  margin-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  width: 35px;
+  text-align: center;
+}

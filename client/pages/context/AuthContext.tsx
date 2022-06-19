@@ -32,6 +32,7 @@ interface IAuthContext {
   isLoading: boolean;
   handleLogin: (data: LoginRequestModel) => void;
   handleRegister: (data: RegisterRequestModel) => void;
+  handleLogout: () => void;
   handleLoginWithLN: () => void;
   lnData: LNData;
 }
@@ -41,6 +42,7 @@ const defaultState = {
   isLoading: false,
   handleLogin: (data: LoginRequestModel) => {},
   handleRegister: (data: RegisterRequestModel) => {},
+  handleLogout: () => {},
   handleLoginWithLN: () => {},
   lnData: { encoded: '', secret: '', url: '' },
 };
@@ -52,14 +54,13 @@ export const AuthContextProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(defaultState.isLoading);
   const [lnAuth, setLnAuth] = useState({});
   const [lnData, setLnData] = useState(defaultState.lnData);
+  const [token, setToken] = useState("")
 
   const router = useRouter();
 
 
   const getEventsSocket = useCallback(() => {
     socket.on('auth', (arg: any) => {
-      console.log('socket connected ', arg);
-
       if (arg.token) {
         storeData('token', arg.token);
         setIsLoading(false);
@@ -81,11 +82,20 @@ export const AuthContextProvider = ({ children }: Props) => {
       setIsLoading(false);
       setIsLoggedIn(true);
       storeData('token', responseData.token);
-      router.push('/dashboard/');
+      let _token = getData('token');
+      if (_token) {
+        setToken(_token)
+        router.push('/dashboard/');
+      }
+
     } else {
       setIsLoading(false);
     }
   };
+  
+  const handleLogout = async () => {
+    return router.push('/');
+  }
 
   const handleRegister = async (data: RegisterRequestModel) => {
     setIsLoading(true);
@@ -100,9 +110,9 @@ export const AuthContextProvider = ({ children }: Props) => {
 
   const handleLoginWithLN = async () => {
     let response = await loginWithLN();
-    console.log('handleLoginWithLN response ', response.data);
     setLnData(response.data);
   };
+  
   useEffect(() => {
     const _getData = async () => {
       let token = await getData('token');
@@ -119,10 +129,12 @@ export const AuthContextProvider = ({ children }: Props) => {
     setIsLoggedIn,
     isLoading,
     handleLogin,
+    handleLogout,
     handleRegister,
     lnData,
     handleLoginWithLN,
     lnAuth,
+    token
   };
 
   return (
@@ -139,11 +151,8 @@ const OPEN_ROUTES = [
 export const ProtectRoute = ({ children }: any) => {
   const router = useRouter();
 
-  console.log('Protected route ', router);
-
   const { isLoading, isLoggedIn } = useContext(AuthContext);
   if (!isLoggedIn && !OPEN_ROUTES.includes(router.pathname)) {
-    console.log('calling Loading screen');
     return <LoadingScreen />;
   }
   return children;
