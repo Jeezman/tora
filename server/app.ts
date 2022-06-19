@@ -20,30 +20,15 @@ walletCheck();
 cron();
 socket(server);
 
-// const io = require('socket.io')(server);
-// let emitSocketEvent: any;
-
-// io.on('connection', (socket:any) => {
-//     console.log('a user connected')
-
-//     socket.on('disconnect', () => {
-//         console.log('User Disconnect');
-//     });
-
-//     emitSocketEvent = socket;
-// })
-
-// export {emitSocketEvent}
-
 // App middlewares
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({
-	secret: process.env.SESSION_SECRET,
-	resave: false,
-	saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
 }));
 
 app.use(passport.initialize());

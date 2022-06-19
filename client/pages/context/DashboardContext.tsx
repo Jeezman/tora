@@ -14,13 +14,13 @@ interface IDashboardContext {
   handleCreateStore: (data: StoreRequestModel) => void;
   handleGetUserBalance: () => void;
   balance: any
-  
+
 }
 
 const defaultState = {
   storeName: '',
   isLoading: false,
-  handleCreateStore: (data: StoreRequestModel) => {},
+  handleCreateStore: (data: StoreRequestModel) => { },
   handleGetUserBalance: () => { },
   balance: 0
 };
@@ -48,9 +48,11 @@ export const DashboardContextProvider = ({ children }: Props) => {
 
   const handleGetUserBalance = async () => {
     let response = await getBalance();
-    console.log('get balance ', response.data);
+    // console.log('get balance ', response.data);
     console.log('handleGetUserBalance ', response);
-    setBalance(response.data.btcbalance)
+    if (response) {
+      setBalance(response.data.btcbalance)
+    }
   }
 
   const contextValue = {

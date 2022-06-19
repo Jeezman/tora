@@ -9,8 +9,9 @@ import {
 import { getData } from '../util/storage';
 
 let token;
-const getToken = () => {
-  let token = getData('token')
+
+const getToken = async () => {
+  let token = await getData('token')
   return token;
 }
 
@@ -116,6 +117,8 @@ export const fetchStore = async () => {
 export const getBalance = async () => {
   try {
     const res = await axios.get('user/balance');
+
+    console.log('Response ====', res.data);
     return res.data;
   } catch (error) {
     console.log('calling error ', error);
