@@ -37,6 +37,12 @@ type ServerError = {
   data: any;
 };
 
+type crowdData = {
+  paymentPin: number;
+  orderId: string;
+  sats: number;
+}
+
 export const createStore = async (
   params: StoreRequestModel
 ): Promise<ConsolidatedStoreDetail> => {
@@ -118,7 +124,26 @@ export const getBalance = async () => {
   try {
     const res = await axios.get('user/balance');
 
-    console.log('Response ====', res.data);
+    return res.data;
+  } catch (error) {
+    console.log('calling error ', error);
+  }
+}
+
+export const generatePin = async () => {
+  try {
+    const res = await axios.get('payment/generatepin');
+
+    return res.data;
+  } catch (error) {
+    console.log('calling error ', error);
+  }
+}
+
+export const handleCrowdPayment = async (data: crowdData) => {
+  try {
+    const res = await axios.post('payment/crowd', data);
+
     return res.data;
   } catch (error) {
     console.log('calling error ', error);

@@ -94,8 +94,8 @@ export const makeCrowdPayment = async (req: Request, res: Response, next: NextFu
 
         const params = {
             minSendable: 500,
-            maxSendable: amountInSats,
-            metadata: `[["text/plain", "lnurl-node", ${paymentId}]]`,
+            maxSendable: Math.round(amountInSats),
+            metadata: `[["text/plain", "lnurl-node", "${paymentId}"]]`,
             commentAllowed: 500,
         };
 

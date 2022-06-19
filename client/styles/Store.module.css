@@ -108,6 +108,7 @@
 .cf_pin_wrap {
   margin-top: 15px;
   position: relative;
+  text-align: center;
 }
 
 .cf_pin {
@@ -116,4 +117,25 @@
   font-weight: bold;
   text-align: center;
   letter-spacing: 8px;
+}
+
+.cf_pin_btn {
+  color: #555;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.crowd_wrap {
+  margin-top: 15px;
+  position: relative;
+  text-align: center;
+}
+
+.crowd_btn {
+  background-color: #3d7db8;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
 }
