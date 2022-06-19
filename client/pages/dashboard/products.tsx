@@ -16,7 +16,7 @@ function Products() {
   };
 
   useEffect(() => {
-    if(!!storeName) handleGetAllProducts();
+    if(!!storeName) handleGetAllProducts(storeName);
   }, [storeName]);
 
   const onAddProduct = (data: ProductRequestModel) => {
@@ -29,7 +29,7 @@ function Products() {
     <section>
       <div className={styles.top}>
         <h1>Products</h1>
-        <Button onClick={() => setShowProductForm(!showProductForm)}>
+        <Button disabled={false} onClick={() => setShowProductForm(!showProductForm)}>
           Add New Product
         </Button>
       </div>

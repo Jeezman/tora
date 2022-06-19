@@ -9,11 +9,17 @@ import { DashboardContext } from '../context/DashboardContext';
 import { BalanceCard } from '../../components/BalanceCard';
 import { TransactionTable } from '../../components/shared/TransactionsTable';
 import { StoreContext } from '../context/StoreContext';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 function Dashboard() {
   const router = useRouter();
   const { handleCreateStore,handleGetUserBalance,balance } = useContext(DashboardContext);
   const { storeName } = useContext(StoreContext);
   const [addStoreModal, setAddStoreModal] = useState(false);
+  const [price, setPrice] = useState(false);
+
+  const { data, error } = useSWR('https://api.coinstats.app/public/v1/coins?skip=0&limit=1', fetcher, { refreshInterval: 60000 });
 
   useEffect(() => {
     handleGetUserBalance()
@@ -33,7 +39,7 @@ function Dashboard() {
       </div>
       <div className='flex w-1/2 justify-between my-10'>
         <BalanceCard title='Bitcoin Wallet' amount={balance} type={1} />
-        <BalanceCard title='USD Wallet' amount={200} type={2} />
+        <BalanceCard title='USD Wallet' amount={Number(balance * data?.coins[0].price).toFixed(2)} type={2} />
       </div>
       <aside>
         <h2 className='mb-8 text-2xl font-semibold'>Recent Activity</h2>
